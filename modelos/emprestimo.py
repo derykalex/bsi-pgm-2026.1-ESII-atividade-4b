@@ -1,4 +1,4 @@
-# Emprestimo: representar contrato de empréstimo.
+# Emprestimo: contrato de empréstimo.
 from dataclasses import dataclass
 from datetime import date
 
