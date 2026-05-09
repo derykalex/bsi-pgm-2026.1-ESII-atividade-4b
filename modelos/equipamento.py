@@ -1,4 +1,4 @@
-# Equipamento: representar dados de equipamento.
+# Equipamento: entidade de domínio.
 from dataclasses import dataclass
 
 @dataclass
