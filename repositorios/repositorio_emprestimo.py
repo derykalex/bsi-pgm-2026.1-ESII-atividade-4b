@@ -13,7 +13,7 @@ class RepositorioEmprestimo:
 
         self.emprestimos = []
 
-    # Buscar equipamento por ID
+        # Buscar equipamento por ID
     def buscar_equipamento(self, equip_id: int):
         for equipamento in self.equipamentos:
             if equipamento.id == equip_id:
