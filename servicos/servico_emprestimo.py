@@ -1,4 +1,5 @@
 # ServicoEmprestimo: regras de negócio.
+
 from datetime import date, timedelta
 
 from modelos.emprestimo import Emprestimo
@@ -26,8 +27,8 @@ class ServicoEmprestimo:
         emprestimo = Emprestimo(
             id=len(self.repositorio.emprestimos) + 1,
             equipamento_id=equip_id,
-            nome_usuario=nome,
-            email_usuario=email,
+            usuario_nome=nome,
+            usuario_email=email,
             data_emprestimo=date.today(),
             data_devolucao=date.today() + timedelta(days=dias)
         )
@@ -56,7 +57,7 @@ class ServicoEmprestimo:
         hoje = date.today()
         multa = 0
 
-        # Regra didática da atividade (if/elif)
+        # OCP aplicado: cada equipamento calcula sua própria multa
         if hoje > emprestimo.data_devolucao:
 
             dias_atraso = (hoje - emprestimo.data_devolucao).days
@@ -65,17 +66,10 @@ class ServicoEmprestimo:
                 emprestimo.equipamento_id
             )
 
-            if equipamento.tipo == "notebook":
-                multa = dias_atraso * 10
-
-            elif equipamento.tipo == "projetor":
-                multa = dias_atraso * 15
-
-            elif equipamento.tipo == "tablet":
-                multa = dias_atraso * 8
+            multa = equipamento.calcular_multa(dias_atraso)
 
             self.notificador.notificar_atraso(
-                emprestimo.email_usuario,
+                emprestimo.usuario_email,
                 multa
             )
 
@@ -85,7 +79,7 @@ class ServicoEmprestimo:
         )
 
         self.notificador.notificar_devolucao(
-            emprestimo.email_usuario
+            emprestimo.usuario_email
         )
 
         return True
@@ -104,9 +98,27 @@ class ServicoEmprestimo:
         print("\n=== EMPRÉSTIMOS EM ATRASO ===")
 
         for emprestimo in atrasados:
+
+            dias_atraso = (
+                date.today() - emprestimo.data_devolucao
+            ).days
+
+            equipamento = self.repositorio.buscar_equipamento(
+                emprestimo.equipamento_id
+            )
+
+            multa = equipamento.calcular_multa(dias_atraso)
+
             print(
                 f"ID: {emprestimo.id} | "
-                f"Usuário: {emprestimo.nome_usuario} | "
-                f"Email: {emprestimo.email_usuario} | "
-                f"Devolução prevista: {emprestimo.data_devolucao}"
+                f"Usuário: {emprestimo.usuario_nome} | "
+                f"Email: {emprestimo.usuario_email} | "
+                f"Devolução prevista: {emprestimo.data_devolucao} | "
+                f"Dias atraso: {dias_atraso} | "
+                f"Multa: R${multa:.2f}"
+            )
+
+            self.notificador.notificar_atraso(
+                emprestimo.usuario_email,
+                multa
             )
