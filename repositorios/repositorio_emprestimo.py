@@ -1,19 +1,21 @@
-# RepositorioEmprestimo: persistência em memória.
-from modelos.equipamento import Equipamento
+# RepositorioEmprestimo: persistência em memória
+
+from modelos.equipamento import Notebook, Projetor, Tablet
+
 
 class RepositorioEmprestimo:
 
     def __init__(self):
         # Base inicial simulada
         self.equipamentos = [
-            Equipamento(1, "Notebook Dell", "notebook"),
-            Equipamento(2, "Projetor Epson", "projetor"),
-            Equipamento(3, "Tablet Samsung", "tablet")
+            Notebook(1, "Notebook Dell", "notebook"),
+            Projetor(2, "Projetor Epson", "projetor"),
+            Tablet(3, "Tablet Samsung", "tablet")
         ]
 
         self.emprestimos = []
 
-        # Buscar equipamento por ID
+    # Buscar equipamento por ID
     def buscar_equipamento(self, equip_id: int):
         for equipamento in self.equipamentos:
             if equipamento.id == equip_id:
@@ -52,7 +54,7 @@ class RepositorioEmprestimo:
         if equipamento:
             equipamento.disponivel = True
 
-    # Buscar empréstimos em atraso
+    # Buscar empréstimos atrasados
     def buscar_emprestimos_atrasados(self, hoje):
         atrasados = []
 
