@@ -9,9 +9,10 @@ from servicos.notificador import Notificador
 
 class ServicoEmprestimo:
 
-    def __init__(self):
-        self.repositorio = RepositorioEmprestimo()
-        self.notificador = Notificador()
+    def __init__(self, repositorio: RepositorioEmprestimo, notificador: Notificador):
+        """DIP aplicado: dependências são injetadas via construtor"""
+        self.repositorio = repositorio
+        self.notificador = notificador
 
     # UC01 — Registrar empréstimo
     def registrar(self, equip_id: int, nome: str, email: str, dias: int):
@@ -57,7 +58,6 @@ class ServicoEmprestimo:
         hoje = date.today()
         multa = 0
 
-        # OCP aplicado: cada equipamento calcula sua própria multa
         if hoje > emprestimo.data_devolucao:
 
             dias_atraso = (hoje - emprestimo.data_devolucao).days
