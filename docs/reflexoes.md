@@ -18,3 +18,25 @@ A aplicação do Princípio Aberto/Fechado (OCP) no sistema de empréstimos perm
 Essa solução funciona bem quando a principal variabilidade está associada ao tipo de equipamento. Entretanto, caso surjam regras mais complexas — como multas por hora, por dia da semana ou políticas promocionais — a hierarquia atual pode se tornar insuficiente. Nesse cenário, apenas herança pode gerar excesso de subclasses e dificultar manutenção, exigindo padrões mais flexíveis, como Strategy.
 
 Segundo Valente, OCP depende da capacidade de antecipar pontos reais de variação, mas sua aplicação excessiva pode resultar em overengineering. Portanto, a decomposição atual atende adequadamente ao contexto identificado hoje, mas pode precisar evoluir se a variabilidade futura ultrapassar a simples diferenciação por tipo.
+
+## Aula 06 — Verificação de LSP
+
+Todas as subclasses de Equipamento (Notebook, Projetor e Tablet) respeitam o contrato da classe base:
+
+- `calcular_multa(0)` retorna `0.0` ✓
+- `calcular_multa(-5)` retorna `0.0` ✓
+- Nenhuma lança exceção inesperada.
+
+Portanto, o **LSP está satisfeito**.
+
+## Aula 06 — DIP
+
+O DIP transformou o ServicoEmprestimo de criador em consumidor de suas dependências. Antes ele mesmo instanciava o repositório e o notificador internamente (dependência concreta). Agora ele recebe essas dependências via construtor.
+
+Essa mudança é tanto técnica quanto conceitual. Tecnicamente, passamos os objetos como parâmetros. Conceitualmente, invertemos o controle: quem usa o serviço (main.py) é quem decide qual implementação fornecer. Isso reduz o acoplamento e torna o ServicoEmprestimo mais testável, pois podemos injetar versões falsas (dublês) para testes unitários.
+
+Como afirma Valente (Cap. 5): “O princípio da inversão de dependência diz que módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de abstrações.”
+
+Essa aplicação do DIP cumpre o RNF04 (testabilidade isolada) e prepara o sistema para a aula de testes.
+
+(218 palavras)
