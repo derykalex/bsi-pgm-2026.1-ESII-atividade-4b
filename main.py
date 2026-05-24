@@ -1,4 +1,6 @@
 # main.py: ponto de entrada principal do sistema.
+from repositorios.repositorio_emprestimo import RepositorioEmprestimo
+from servicos.notificador import Notificador
 from servicos.servico_emprestimo import ServicoEmprestimo
 
 
@@ -11,7 +13,10 @@ def exibir_menu():
 
 
 def main():
-    servico = ServicoEmprestimo()
+    # DIP: criamos as dependências aqui e injetamos no serviço
+    repositorio = RepositorioEmprestimo()
+    notificador = Notificador()
+    servico = ServicoEmprestimo(repositorio, notificador)
 
     while True:
         exibir_menu()
