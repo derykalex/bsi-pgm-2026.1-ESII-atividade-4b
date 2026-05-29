@@ -4,39 +4,35 @@ from modelos.equipamento import Tablet
 
 
 def test_calcular_multa_notebook():
-
-    notebook = Notebook(
-        1,
-        "Dell",
-        "notebook"
-    )
-
-    resultado = notebook.calcular_multa(3)
-
-    assert resultado == 30.0
+    notebook = Notebook(1, "Dell", "notebook")
+    assert notebook.calcular_multa(3) == 30.0
 
 
 def test_calcular_multa_projetor():
-
-    projetor = Projetor(
-        2,
-        "Epson",
-        "projetor"
-    )
-
-    resultado = projetor.calcular_multa(2)
-
-    assert resultado == 30.0
+    projetor = Projetor(2, "Epson", "projetor")
+    assert projetor.calcular_multa(2) == 30.0
 
 
 def test_calcular_multa_tablet():
+    tablet = Tablet(3, "Samsung", "tablet")
+    assert tablet.calcular_multa(5) == 40.0
 
-    tablet = Tablet(
-        3,
-        "Samsung",
-        "tablet"
-    )
 
-    resultado = tablet.calcular_multa(5)
+def test_multa_notebook_sem_atraso():
+    notebook = Notebook(1, "Dell", "notebook")
+    assert notebook.calcular_multa(0) == 0
 
-    assert resultado == 40.0
+
+def test_multa_projetor_sem_atraso():
+    projetor = Projetor(2, "Epson", "projetor")
+    assert projetor.calcular_multa(0) == 0
+
+
+def test_multa_tablet_sem_atraso():
+    tablet = Tablet(3, "Samsung", "tablet")
+    assert tablet.calcular_multa(0) == 0
+
+
+def test_multa_notebook_um_dia():
+    notebook = Notebook(1, "Dell", "notebook")
+    assert notebook.calcular_multa(1) > 0
