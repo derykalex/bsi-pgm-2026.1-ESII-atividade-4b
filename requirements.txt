@@ -1,5 +1,0 @@
-# Projeto utiliza apenas biblioteca padrão do Python
-# dependências do projeto
-
-pytest
-pytest-cov
