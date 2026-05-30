@@ -1,4 +1,4 @@
-name: CI
+name: Testes Python
 
 on:
   push:
@@ -9,16 +9,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Instalar dependências
         run: |
-          pip install -r requirements-dev.txt
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
 
-      - name: Run tests with coverage
+      - name: Configurar PYTHONPATH
         run: |
-          pytest --cov=. --cov-report=term-missing
+          echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
+      - name: Executar testes
+        run: |
+          pytest tests/ --cov=. --cov-report=term-missing
