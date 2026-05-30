@@ -26,3 +26,17 @@ Melhorias obtidas:
 - Redução de regressões;
 - Melhor documentação do comportamento esperado do sistema;
 - Integração contínua com GitHub Actions.
+
+## Cobertura de Testes
+
+Os testes automatizados validam:
+
+- Registro de empréstimos
+- Cálculo de multas
+- Integração do serviço de empréstimos
+- Regras de negócio principais
+
+Ferramentas utilizadas:
+- pytest
+- pytest-cov
+- GitHub Actions
