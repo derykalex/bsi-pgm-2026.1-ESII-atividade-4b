@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
 
-
 class INotificador(ABC):
 
     @abstractmethod
-    def notificar_emprestimo(self, email, data):
+    def notificar_emprestimo(self, email, data_devolucao):
         pass
 
     @abstractmethod
