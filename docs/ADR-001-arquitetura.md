@@ -1,5 +1,10 @@
 # ADR-001 — Decisão Arquitetural da v2.0
 
+**Status:** Accepted
+**Data:** 2026-05-31
+
+---
+
 ## Contexto
 O sistema legado `emprestimos.py` foi desenvolvido em arquivo único, concentrando regras de negócio, armazenamento de dados, notificações e interface CLI em um único módulo. Essa estrutura gera baixa coesão, alto acoplamento e dificulta manutenção, testes e evolução do sistema. Para atender RNF03 (facilidade de extensão) e RNF04 (testabilidade sem dependência de estado global), tornou-se necessária uma reorganização estrutural.
 
