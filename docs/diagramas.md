@@ -1,4 +1,4 @@
-# Diagramas e Decomposição em Camadas — Atividade 4a
+# Diagramas e Decomposição em Camadas — Atividade 4a / 8
 
 **Aluno:** Alex da Silva Oliveira  
 **Disciplina:** Engenharia de Software II  
@@ -6,93 +6,79 @@
 
 ---
 
-# Decomposição em Camadas
-
-## models/Equipamento
-Representa a entidade de domínio Equipamento, armazenando seus dados e disponibilidade.
-
-## models/Emprestimo
-Representa o contrato de empréstimo, contendo usuário, datas e status.
-
-## services/ServicoEmprestimo
-Centraliza regras de negócio de empréstimo, devolução e atrasos.
-
-## services/Notificador
-Responsável exclusivamente pelas notificações.
-
-## repositories/RepositorioEmprestimo
-Gerencia armazenamento, busca e atualização de dados.
-
-## main.py
-Responsável pela interface CLI e interação com usuário.
-
----
-
-# Diagramas de Sequência
-
-## UC01 — Registrar Empréstimo
+## Diagrama de classes — v2.0
 
 ```mermaid
-sequenceDiagram
- actor Atendente
- participant main as main.py
- participant servico as ServicoEmprestimo
- participant repo as RepositorioEmprestimo
- participant notif as Notificador
- Atendente->>main: informa equip_id, nome, email, dias
- main->>servico: registrar(equip_id, nome, email, dias)
- servico->>repo: buscar_equipamento(equip_id)
- repo-->>servico: Equipamento
- alt equipamento disponível
- servico->>repo: salvar_emprestimo(emprestimo)
- servico->>repo: marcar_indisponivel(equip_id)
- servico->>notif: notificar_emprestimo(email, data_devolucao)
- servico-->>main: True
- else equipamento indisponível
- servico-->>main: False
- end
-```
-## UC02 — Registrar Devolução
+classDiagram
+    class IRepositorioEmprestimo {
+        <<interface>>
+        +buscar_equipamento(equip_id)
+        +salvar_emprestimo(emprestimo)
+        +buscar_emprestimo(emprestimo_id)
+        +marcar_indisponivel(equip_id)
+        +marcar_disponivel(equip_id)
+        +marcar_devolvido(emprestimo_id)
+        +listar_em_atraso()
+        +proximo_id_emprestimo()
+    }
 
-```mermaid
-sequenceDiagram
- actor Atendente
- participant main as main.py
- participant servico as ServicoEmprestimo
- participant repo as RepositorioEmprestimo
- participant notif as Notificador
- Atendente->>main: informa emprestimo_id
- main->>servico: registrar_devolucao(emprestimo_id)
- servico->>repo: buscar_emprestimo(emprestimo_id)
- repo-->>servico: Emprestimo
- alt empréstimo ativo
- servico->>repo: marcar_devolvido(emprestimo_id)
- servico->>repo: marcar_disponivel(equip_id)
- servico->>notif: notificar_devolucao(email)
- servico-->>main: True
- else empréstimo inválido
- servico-->>main: False
- end
-```
+    class INotificador {
+        <<interface>>
+        +notificar_emprestimo(email, data_devolucao)
+        +notificar_devolucao(email, multa)
+        +notificar_atraso(email)
+    }
 
-## UC03 — Listar Empréstimos em Atraso
+    class RepositorioEmprestimo {
+        -equipamentos: List[Equipamento]
+        -emprestimos: List[Emprestimo]
+    }
 
-```mermaid
-sequenceDiagram
- actor Atendente
- participant main as main.py
- participant servico as ServicoEmprestimo
- participant repo as RepositorioEmprestimo
- Atendente->>main: solicita atrasados
- main->>servico: listar_atrasados()
- servico->>repo: buscar_emprestimos_atrasados()
- repo-->>servico: lista
- alt existem atrasados
- loop para cada empréstimo
- servico-->>main: exibir_atrasado()
- end
- else sem atrasos
- servico-->>main: lista_vazia
- end
-```
+    class Notificador {
+    }
 
+    class ServicoEmprestimo {
+        -repositorio: IRepositorioEmprestimo
+        -notificador: INotificador
+        +registrar(equip_id, nome, email, dias)
+        +registrar_devolucao(emprestimo_id)
+        +listar_atrasados()
+    }
+
+    class Equipamento {
+        <<abstract>>
+        +id: int
+        +nome: str
+        +tipo: str
+        +disponivel: bool
+        +calcular_multa(dias_atraso: int)
+    }
+
+    class Notebook {
+    }
+    class Projetor {
+    }
+    class Tablet {
+    }
+
+    class Emprestimo {
+        +id: int
+        +equipamento_id: int
+        +usuario_nome: str
+        +usuario_email: str
+        +data_emprestimo: date
+        +data_devolucao: date
+        +devolvido: bool
+    }
+
+    ServicoEmprestimo --> IRepositorioEmprestimo
+    ServicoEmprestimo --> INotificador
+    RepositorioEmprestimo ..|> IRepositorioEmprestimo
+    Notificador ..|> INotificador
+
+    Notebook --|> Equipamento
+    Projetor --|> Equipamento
+    Tablet --|> Equipamento
+
+    RepositorioEmprestimo o-- Equipamento
+    RepositorioEmprestimo o-- Emprestimo
