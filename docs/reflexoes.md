@@ -39,4 +39,12 @@ Como afirma Valente (Cap. 5): “O princípio da inversão de dependência diz q
 
 Essa aplicação do DIP cumpre o RNF04 (testabilidade isolada) e prepara o sistema para a aula de testes.
 
-(218 palavras)
+## Aula 08 — Testes
+
+Este teste de integração captura algo que os testes de unidade não capturam: a integração real entre as camadas (ServicoEmprestimo, RepositorioEmprestimo e Notificador). Ele verifica se as classes concretas trabalham juntas corretamente, incluindo o fluxo completo de registrar um empréstimo e verificar o estado do repositório após a operação. Isso garante que não há problemas de compatibilidade entre as implementações reais.
+
+Por outro lado, o teste de integração **não** captura tão bem falhas isoladas em regras específicas de negócio (como cálculo de multa ou comportamento do Spy), porque tudo roda junto. Os testes unitários com Fake e Spy são melhores para isolar e testar comportamentos individuais com precisão e rapidez. 
+
+A combinação dos dois tipos de teste (unidade + integração) oferece uma boa cobertura: velocidade e isolamento dos unitários com confiança na integração real do sistema.
+
+
