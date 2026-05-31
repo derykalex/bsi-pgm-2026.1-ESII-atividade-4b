@@ -21,4 +21,4 @@ jobs:
 
       - name: Executar testes
         run: |
-          pytest --cov=. --cov-report=term-missing
+          pytest tests/ --cov=. --cov-report=term-missing
