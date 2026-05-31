@@ -1,6 +1,6 @@
 import pytest
 from datetime import date, timedelta
-from models.equipamento import Notebook, Projetor, Tablet
+from modelos.equipamento import Notebook, Projetor, Tablet
 from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
