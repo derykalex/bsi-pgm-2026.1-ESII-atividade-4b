@@ -47,4 +47,13 @@ Por outro lado, o teste de integração **não** captura tão bem falhas isolada
 
 A combinação dos dois tipos de teste (unidade + integração) oferece uma boa cobertura: velocidade e isolamento dos unitários com confiança na integração real do sistema.
 
+## Conexão com a próxima aula (Aula 09 — TDD)
+
+A Aula 9, que aborda Test-Driven Development (TDD) segundo Kent Beck e o ciclo **red-green-refactor**, representa uma inversão completa na forma de desenvolver software. Em vez de escrever o código primeiro e depois os testes, o teste se torna o ponto de partida.
+
+Percebo agora que todo o trabalho realizado nesta Atividade 8 foi uma preparação essencial para o TDD. As **interfaces `abc.ABC`** (`IRepositorioEmprestimo` e `INotificador`) criadas fornecem contratos claros e estáveis, enquanto a infraestrutura de **dublês** (`RepositorioFake` e `NotificadorSpy`) permite isolar o comportamento do `ServicoEmprestimo` durante os testes. 
+
+Sem essas abstrações e dublês formais, seria muito mais difícil seguir o ciclo red-green-refactor de forma natural na próxima aula. Essa preparação transforma o TDD de uma prática teórica em algo viável e produtivo no nosso projeto.
+
+Estou ansioso para aplicar o TDD na implementação de novas funcionalidades, confiando na estrutura que construímos até aqui.
 
