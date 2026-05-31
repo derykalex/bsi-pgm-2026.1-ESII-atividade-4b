@@ -1,5 +1,5 @@
 import pytest
-from models.equipamento import Notebook, Projetor, Tablet
+from modelos.equipamento import Notebook, Projetor, Tablet
 
 
 @pytest.mark.parametrize("equipamento, dias, esperado", [
