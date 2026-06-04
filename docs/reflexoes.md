@@ -57,3 +57,13 @@ Sem essas abstrações e dublês formais, seria muito mais difícil seguir o cic
 
 Estou ansioso para aplicar o TDD na implementação de novas funcionalidades, confiando na estrutura que construímos até aqui.
 
+## Aula 09 — TDD
+
+Comparando o mesmo comportamento escrito como teste TDD (assert ...) e como cenário BDD (Dado-Quando-Então): o **BDD comunica muito melhor** com um cliente não técnico. O formato Given-When-Then usa linguagem natural, próxima do negócio, fácil de entender por Product Owners ou usuários finais. Já o teste TDD é mais técnico, granular e voltado para o desenvolvedor.
+
+Eu preferiria usar **TDD durante o desenvolvimento** (feedback rápido, segurança para refatorar, granularidade alta) e **BDD para documentação de requisitos** e comunicação com o time de negócio. O TDD me deu confiança para fazer o refactor com `max()` nas duas funções sem medo de quebrar algo. O BDD ajudou a pensar no comportamento de "fora para dentro".
+
+No geral, o TDD mudou minha forma de programar: agora penso primeiro no que o código deve fazer (teste vermelho) antes de implementar.
+
+
+
