@@ -19,3 +19,7 @@ def test_devolucao_antecipada_gera_desconto():
 def test_devolucao_antecipada_maior_desconto():
     desconto = calcular_desconto_antecipado(dias_adiantados=5, valor_dia=8.0)
     assert desconto == 40.0
+
+def test_devolucao_sem_adiantamento_nao_gera_desconto_negativo():
+    desconto = calcular_desconto_antecipado(dias_adiantados=-2, valor_dia=10.0)
+    assert desconto == 0.0
