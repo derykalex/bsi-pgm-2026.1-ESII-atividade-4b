@@ -15,3 +15,7 @@ def test_atraso_dentro_da_carencia_nao_gera_multa_negativa():
 def test_devolucao_antecipada_gera_desconto():
     desconto = calcular_desconto_antecipado(dias_adiantados=3, valor_dia=5.0)
     assert desconto == 15.0
+
+def test_devolucao_antecipada_maior_desconto():
+    desconto = calcular_desconto_antecipado(dias_adiantados=5, valor_dia=8.0)
+    assert desconto == 40.0
