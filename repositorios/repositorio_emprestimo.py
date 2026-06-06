@@ -1,8 +1,11 @@
-# RepositorioEmprestimo: persistência em memória
-from repositorios.interfaces import IRepositorioEmprestimo
-from modelos.equipamento import Notebook, Projetor, Tablet
-from datetime import date
-
+    def __init__(self):
+        # Base inicial simulada - usando Simple Factory (Aula 10)
+        self.equipamentos = [
+            EquipamentoFactory.criar_equipamento("notebook", 1, "Notebook Dell"),
+            EquipamentoFactory.criar_equipamento("projetor", 2, "Projetor Epson"),
+            EquipamentoFactory.criar_equipamento("tablet", 3, "Tablet Samsung")
+        ]
+        self.emprestimos = []
 
 class RepositorioEmprestimo(IRepositorioEmprestimo):
 
