@@ -1,24 +1,14 @@
-# Notificador: responsável pela comunicação com o usuário.
-from servicos.interfaces import INotificador
+from servicos.observadores import Notificador as NotificadorBase
 
 
-class Notificador(INotificador):
+class NotificadorEmail(NotificadorBase):
+    """Observer concreto - envio de email"""
 
-    # Notificação de registro de empréstimo
-    def notificar_emprestimo(self, email: str, data_devolucao):
-        print(
-            f"[EMAIL] Empréstimo registrado para {email}. "
-            f"Data prevista para devolução: {data_devolucao}"
-        )
-
-    # Notificação de devolução concluída
-    def notificar_devolucao(self, email: str, multa: float = 0.0):
-        print(
-            f"[EMAIL] Devolução registrada com sucesso para {email}"
-        )
-
-    # Notifica atraso com multa
-    def notificar_atraso(self, email: str):
-        print(
-            f"[EMAIL] Atenção {email}: empréstimo em atraso."
-        )
+    def atualizar(self, evento: str, dados: dict):
+        email = dados.get("email")
+        if evento == "emprestimo":
+            print(f"[EMAIL] Empréstimo registrado para {email}")
+        elif evento == "devolucao":
+            print(f"[EMAIL] Devolução registrada para {email}")
+        elif evento == "atraso":
+            print(f"[EMAIL] Atenção {email}: empréstimo em atraso!")
