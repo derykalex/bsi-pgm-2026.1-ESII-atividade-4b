@@ -1,7 +1,6 @@
-# Equipamento: entidade de domínio com OCP (Aula 05)
-
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from modelos.estrategias.multas import EstrategiaMulta, MultaDiariaPadrao
 
 
 @dataclass
@@ -10,25 +9,24 @@ class Equipamento(ABC):
     nome: str
     tipo: str
     disponivel: bool = True
+    _estrategia_multa: EstrategiaMulta = field(default_factory=MultaDiariaPadrao, init=False)
 
-    @abstractmethod
+    def definir_estrategia_multa(self, estrategia: EstrategiaMulta):
+        self._estrategia_multa = estrategia
+
     def calcular_multa(self, dias_atraso: int) -> float:
-        pass
+        return self._estrategia_multa.calcular(dias_atraso)
 
 
+# Subclasses continuam existindo, mas sem calcular_multa
 @dataclass
 class Notebook(Equipamento):
-    def calcular_multa(self, dias_atraso: int) -> float:
-        return max(0.0, dias_atraso * 10.0)
-
+    pass
 
 @dataclass
 class Projetor(Equipamento):
-    def calcular_multa(self, dias_atraso: int) -> float:
-        return max(0.0, dias_atraso * 15.0)
-
+    pass
 
 @dataclass
 class Tablet(Equipamento):
-    def calcular_multa(self, dias_atraso: int) -> float:
-        return max(0.0, dias_atraso * 8.0)
+    pass
