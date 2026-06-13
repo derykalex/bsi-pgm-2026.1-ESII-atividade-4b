@@ -1,6 +1,6 @@
 from datetime import date
 from repositorios.interfaces import IRepositorioEmprestimo
-from modelos.fabrica_equipamento import EquipamentoFactory
+from modelos.equipamento_factory import EquipamentoFactory
 
 
 class RepositorioEmprestimo(IRepositorioEmprestimo):
