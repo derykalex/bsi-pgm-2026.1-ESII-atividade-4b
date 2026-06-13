@@ -63,7 +63,6 @@ class NotificadorSpy(INotificador):
         self.eventos.append(("atraso", email))
 
 
-# Fixtures
 @pytest.fixture
 def repositorio_fake():
     return RepositorioFake()
