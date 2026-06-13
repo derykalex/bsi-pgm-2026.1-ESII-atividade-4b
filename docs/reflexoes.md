@@ -65,5 +65,14 @@ Eu preferiria usar **TDD durante o desenvolvimento** (feedback rápido, seguran�
 
 No geral, o TDD mudou minha forma de programar: agora penso primeiro no que o código deve fazer (teste vermelho) antes de implementar.
 
+## Aula 10 — Factory e Facade
+
+### 1. Factory × OCP
+A fábrica ainda usa if/elif (ou um mapa) para decidir a classe concreta. Isso é aceitável porque o Factory é o **único lugar** que conhece as classes concretas (Notebook, Projetor, Tablet). O resto do sistema (ServicoEmprestimo, Repositorio, etc.) fica completamente desacoplado dos concretos — ele só vê `Equipamento`. Isso "paga" o acoplamento em um único ponto para que o resto do código fique aberto para extensão (adicionar novo tipo de equipamento exige mudar só a fábrica).
+
+### 2. Facade × DIP
+A Facade não quebra o DIP porque ela é a **raiz de composição** (onde os objetos concretos são criados e injetados). O `ServicoEmprestimo` continua recebendo abstrações (`IRepositorioEmprestimo` e `INotificador`) via construtor. Os testes continuam injetando os dublês (`RepositorioFake` e `NotificadorSpy`) diretamente no serviço, sem tocar na Facade. A fachada apenas delega, mantendo o DIP intacto nas camadas internas.
+
+(Valente, Cap. 6)
 
 
