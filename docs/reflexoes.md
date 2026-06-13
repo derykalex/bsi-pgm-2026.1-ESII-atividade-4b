@@ -78,3 +78,13 @@ A Facade não quebra o DIP porque ela é a **raiz de composição** (onde os obj
 Apliquei o Simple Factory no repositório para centralizar a criação dos equipamentos (Notebook, Projetor, Tablet). Agora, se precisarmos adicionar um novo tipo (ex: "Cabo"), só alteramos a fábrica. A Facade `SistemaDeEmprestimos` atua como raiz de composição, mantendo o DIP nos testes.
 
 
+## Aula 11 — Strategy e Observer
+
+### Strategy × Herança
+A aplicação do Strategy permitiu remover o cálculo de multa das subclasses de Equipamento (Notebook, Projetor, Tablet), substituindo por composição. Agora é possível mudar o comportamento da multa em tempo de execução sem alterar as classes concretas. Isso atende melhor ao OCP do que a herança pura.
+
+### Observer × Acoplamento
+O padrão Observer permitiu que o Notificador notificasse múltiplos interessados sem depender diretamente deles. O ServicoEmprestimo agora só chama o subject, mantendo baixo acoplamento.
+
+(Valente, Cap. 6)
+
