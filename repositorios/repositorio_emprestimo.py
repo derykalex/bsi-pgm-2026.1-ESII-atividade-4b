@@ -1,20 +1,17 @@
-    def __init__(self):
-        # Base inicial simulada - usando Simple Factory (Aula 10)
-        self.equipamentos = [
-            EquipamentoFactory.criar_equipamento("notebook", 1, "Notebook Dell"),
-            EquipamentoFactory.criar_equipamento("projetor", 2, "Projetor Epson"),
-            EquipamentoFactory.criar_equipamento("tablet", 3, "Tablet Samsung")
-        ]
-        self.emprestimos = []
+from datetime import date
+from repositorios.interfaces import IRepositorioEmprestimo
+from modelos.fabrica_equipamento import EquipamentoFactory
+
 
 class RepositorioEmprestimo(IRepositorioEmprestimo):
 
     def __init__(self):
-        # Base inicial simulada
+        # Base inicial simulada - usando Simple Factory (Aula 10)
+        criar = EquipamentoFactory.criar_equipamento
         self.equipamentos = [
-            Notebook(1, "Notebook Dell", "notebook"),
-            Projetor(2, "Projetor Epson", "projetor"),
-            Tablet(3, "Tablet Samsung", "tablet")
+            criar("notebook", 1, "Notebook Dell"),
+            criar("projetor", 2, "Projetor Epson"),
+            criar("tablet", 3, "Tablet Samsung")
         ]
         self.emprestimos = []
 
@@ -55,7 +52,6 @@ class RepositorioEmprestimo(IRepositorioEmprestimo):
                 atrasados.append(emprestimo)
         return atrasados
 
-    # Métodos adicionais da interface
     def listar_em_atraso(self):
         return self.buscar_emprestimos_atrasados(date.today())
 
