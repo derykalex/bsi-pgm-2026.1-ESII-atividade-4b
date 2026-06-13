@@ -1,7 +1,5 @@
-# main.py: ponto de entrada principal do sistema.
-from repositorios.repositorio_emprestimo import RepositorioEmprestimo
-from servicos.notificador import Notificador
-from servicos.servico_emprestimo import ServicoEmprestimo
+# main.py
+from app.sistema import SistemaDeEmprestimos
 
 
 def exibir_menu():
@@ -13,71 +11,42 @@ def exibir_menu():
 
 
 def main():
-    # DIP: criamos as dependências aqui e injetamos no serviço
-    repositorio = RepositorioEmprestimo()
-    notificador = Notificador()
-    servico = ServicoEmprestimo(repositorio, notificador)
+    # Facade: uma linha monta tudo
+    sistema = SistemaDeEmprestimos()
 
     while True:
         exibir_menu()
-
         opcao = input("Escolha uma opção: ")
 
         try:
-            # UC01
             if opcao == "1":
                 equip_id = int(input("ID do equipamento: "))
                 nome = input("Nome do usuário: ")
                 email = input("Email: ")
                 dias = int(input("Quantidade de dias: "))
 
-                sucesso = servico.registrar(
-                    equip_id,
-                    nome,
-                    email,
-                    dias
-                )
+                sucesso = sistema.registrar(equip_id, nome, email, dias)
+                print("Empréstimo registrado com sucesso." if sucesso else
+                      "Falha no registro: equipamento inexistente ou indisponível.")
 
-                if sucesso:
-                    print("Empréstimo registrado com sucesso.")
-                else:
-                    print(
-                        "Falha no registro: equipamento inexistente ou indisponível."
-                    )
-
-            # UC02
             elif opcao == "2":
-                emprestimo_id = int(
-                    input("ID do empréstimo para devolução: ")
-                )
+                emprestimo_id = int(input("ID do empréstimo para devolução: "))
+                sucesso = sistema.registrar_devolucao(emprestimo_id)
+                print("Devolução registrada com sucesso." if sucesso else
+                      "Falha na devolução: empréstimo inválido ou já devolvido.")
 
-                sucesso = servico.registrar_devolucao(
-                    emprestimo_id
-                )
-
-                if sucesso:
-                    print("Devolução registrada com sucesso.")
-                else:
-                    print(
-                        "Falha na devolução: empréstimo inválido ou já devolvido."
-                    )
-
-            # UC03
             elif opcao == "3":
-                servico.listar_atrasados()
+                sistema.listar_atrasados()
 
-            # Sair
             elif opcao == "4":
                 print("Encerrando sistema...")
                 break
 
             else:
-                print("Opção inválida. Tente novamente.")
+                print("Opção inválida.")
 
         except ValueError:
-            print(
-                "Erro: entrada inválida. Use números onde solicitado."
-            )
+            print("Erro: entrada inválida. Use números onde solicitado.")
 
 
 if __name__ == "__main__":
