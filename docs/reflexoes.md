@@ -75,4 +75,6 @@ A Facade não quebra o DIP porque ela é a **raiz de composição** (onde os obj
 
 (Valente, Cap. 6)
 
+Apliquei o Simple Factory no repositório para centralizar a criação dos equipamentos (Notebook, Projetor, Tablet). Agora, se precisarmos adicionar um novo tipo (ex: "Cabo"), só alteramos a fábrica. A Facade `SistemaDeEmprestimos` atua como raiz de composição, mantendo o DIP nos testes.
+
 
