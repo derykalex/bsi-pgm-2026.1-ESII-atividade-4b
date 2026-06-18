@@ -8,11 +8,9 @@ def test_fluxo_registrar_devolver_com_componentes_reais():
     servico = ServicoEmprestimo(repositorio)
     servico.registrar_observer(NotificadorEmail())
 
-    # Registrar
     sucesso = servico.registrar(1, "Ana", "ana@ufra.edu.br", dias=7)
     assert sucesso is True
 
-    # Verificar
     emprestimo = repositorio.buscar_emprestimo(1)
     assert emprestimo is not None
     assert emprestimo.equipamento_id == 1
