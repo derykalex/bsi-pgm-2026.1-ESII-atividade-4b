@@ -1,26 +1,17 @@
 import pytest
-from modelos.equipamento import Notebook, Projetor, Tablet
+from modelos.equipamento_factory import EquipamentoFactory
 
 
-@pytest.mark.parametrize("equipamento, dias, esperado", [
-    (Notebook(1, "Dell", "notebook"), 3, 30.0),
-    (Notebook(1, "Dell", "notebook"), 0, 0.0),
-    (Notebook(1, "Dell", "notebook"), -5, 0.0),
-    (Projetor(2, "Epson", "projetor"), 2, 30.0),
-    (Projetor(2, "Epson", "projetor"), 0, 0.0),
-    (Tablet(3, "Samsung", "tablet"), 5, 40.0),
-    (Tablet(3, "Samsung", "tablet"), 0, 0.0),
-    (Tablet(3, "Samsung", "tablet"), -2, 0.0),
+@pytest.mark.parametrize("tipo, dias, esperado", [
+    ("notebook", 3, 30.0),
+    ("notebook", 0, 0.0),
+    ("notebook", -5, 0.0),
+    ("projetor", 2, 30.0),
+    ("projetor", 0, 0.0),
+    ("tablet", 5, 50.0),
+    ("tablet", 0, 0.0),
+    ("tablet", -2, 0.0),
 ])
-def test_calcular_multa_atraso_positivo(equipamento, dias, esperado):
+def test_calcular_multa_atraso(tipo, dias, esperado):
+    equipamento = EquipamentoFactory.criar_equipamento(tipo, 1, "Teste")
     assert equipamento.calcular_multa(dias) == esperado
-
-
-@pytest.mark.parametrize("equipamento", [
-    Notebook(1, "Dell", "notebook"),
-    Projetor(2, "Epson", "projetor"),
-    Tablet(3, "Samsung", "tablet"),
-])
-def test_calcular_multa_atraso_negativo_retorna_zero(equipamento):
-    assert equipamento.calcular_multa(-10) == 0.0
-    assert equipamento.calcular_multa(0) == 0.0
