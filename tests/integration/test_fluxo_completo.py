@@ -1,19 +1,18 @@
 from repositorios.repositorio_emprestimo import RepositorioEmprestimo
-from servicos.notificador import Notificador
 from servicos.servico_emprestimo import ServicoEmprestimo
+from servicos.notificador_email import NotificadorEmail
 
 
 def test_fluxo_registrar_devolver_com_componentes_reais():
-    # Arrange — componentes REAIS
     repositorio = RepositorioEmprestimo()
-    notificador = Notificador()
-    servico = ServicoEmprestimo(repositorio, notificador)
+    servico = ServicoEmprestimo(repositorio)
+    servico.registrar_observer(NotificadorEmail())
 
-    # Act
+    # Registrar
     sucesso = servico.registrar(1, "Ana", "ana@ufra.edu.br", dias=7)
-
-    # Assert
     assert sucesso is True
+
+    # Verificar
     emprestimo = repositorio.buscar_emprestimo(1)
     assert emprestimo is not None
     assert emprestimo.equipamento_id == 1
