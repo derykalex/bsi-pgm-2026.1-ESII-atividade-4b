@@ -2,11 +2,8 @@ from datetime import date
 from repositorios.interfaces import IRepositorioEmprestimo
 from modelos.equipamento_factory import EquipamentoFactory
 
-
 class RepositorioEmprestimo(IRepositorioEmprestimo):
-
     def __init__(self):
-        # Base inicial simulada - usando Simple Factory (Aula 10)
         criar = EquipamentoFactory.criar_equipamento
         self.equipamentos = [
             criar("notebook", 1, "Notebook Dell"),
@@ -45,18 +42,9 @@ class RepositorioEmprestimo(IRepositorioEmprestimo):
         if emprestimo:
             emprestimo.devolvido = True
 
-    def buscar_emprestimos_atrasados(self, hoje):
-        atrasados = []
-        for emprestimo in self.emprestimos:
-            if not emprestimo.devolvido and emprestimo.data_devolucao < hoje:
-                atrasados.append(emprestimo)
-        return atrasados
-
     def listar_em_atraso(self):
-        return self.buscar_emprestimos_atrasados(date.today())
+        hoje = date.today()
+        return [e for e in self.emprestimos if not e.devolvido and e.data_devolucao < hoje]
 
     def proximo_id_emprestimo(self):
         return len(self.emprestimos) + 1
-
-# Após criar os equipamentos
-self.equipamentos[0].definir_estrategia_multa(MultaComCarencia(valor_por_dia=10.0, carencia_dias=1))  # Notebook
