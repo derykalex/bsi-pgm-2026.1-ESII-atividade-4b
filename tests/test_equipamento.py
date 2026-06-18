@@ -13,5 +13,5 @@ from modelos.equipamento_factory import EquipamentoFactory
     ("tablet", -2, 0.0),
 ])
 def test_calcular_multa_atraso(tipo, dias, esperado):
-    equipamento = EquipamentoFactory.criar_equipamento(tipo, 1, "Teste")
+    equipamento = EquipamentoFactory.criar_equipamento(tipo, 999, "Teste")
     assert equipamento.calcular_multa(dias) == esperado
