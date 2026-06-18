@@ -88,3 +88,23 @@ O padrão Observer permitiu que o Notificador notificasse múltiplos interessado
 
 (Valente, Cap. 6)
 
+## Aula 11 — Strategy e Observer
+
+**1. Strategy × herança da Aula 5**  
+Na Aula 5 aplicamos herança: o cálculo de multa ficava dentro das subclasses (`Notebook`, `Projetor`, `Tablet`). Isso funcionava, mas amarrava o algoritmo à dimensão "tipo de equipamento". Com o **Strategy**, extraímos o algoritmo para uma hierarquia separada (`MultaStrategy` / `MultaPorDia`). Agora o `Equipamento` é apenas um Context que delega o comportamento.  
+Vantagem: é possível criar novas políticas de multa (ex: MultaProgressiva, MultaComCarencia, desconto por hora) sem modificar as classes de equipamento. Isso atende melhor ao OCP do que a herança pura.
+
+**2. Observer e o evento-dict**  
+O padrão Observer melhorou bastante o `ServicoEmprestimo`:  
+- **SRP**: o serviço só emite eventos, não cuida de como notificar.  
+- **OCP**: fácil adicionar novos observers (SMS, Log, WhatsApp) sem alterar o serviço.  
+- **DIP**: o serviço depende da abstração (`Subject`/`Observer`).  
+
+O uso de `dict` como evento é um **code smell** (Primitive Obsession), mas foi uma decisão consciente da atividade para focar no padrão. Na Aula 12 isso será refatorado para uma `@dataclass Evento` tipada.
+
+(Valente, Cap. 6 — Padrões de Projeto)
+
+---
+
+
+
