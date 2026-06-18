@@ -17,7 +17,8 @@ def test_registrar_devolve_false_quando_equipamento_indisponivel(servico, reposi
 def test_registrar_notifica_usuario_apos_sucesso(servico, notificador_spy):
     servico.registrar(1, "Ana", "ana@test.com", 7)
     assert len(notificador_spy.eventos) == 1
-    assert notificador_spy.eventos[0][0] == "emprestimo"
+    assert notificador_spy.eventos[0]["tipo"] == "emprestimo"
+    assert notificador_spy.eventos[0]["email"] == "ana@test.com"
 
 
 def test_devolver_calcula_multa_correta_para_atraso(servico, repositorio_fake):
@@ -38,3 +39,11 @@ def test_devolver_marca_equipamento_como_disponivel(servico, repositorio_fake):
 def test_devolver_falha_silenciosamente_para_emprestimo_inexistente(servico):
     resultado = servico.registrar_devolucao(999)
     assert resultado is False
+
+
+def test_listar_atrasados_notifica(servico, notificador_spy, repositorio_fake):
+    servico.registrar(1, "Ana", "ana@test.com", 7)
+    emp = repositorio_fake.buscar_emprestimo(1)
+    emp.data_devolucao = date.today() - timedelta(days=5)
+    servico.listar_atrasados()
+    assert any(e["tipo"] == "atraso" for e in notificador_spy.eventos)
