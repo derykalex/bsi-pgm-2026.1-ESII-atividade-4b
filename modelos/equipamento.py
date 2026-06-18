@@ -1,34 +1,20 @@
-from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-from modelos.estrategias.multas import EstrategiaMulta, MultaDiariaPadrao
-
+from dataclasses import dataclass
+from modelos.multa_strategy import MultaStrategy
 
 @dataclass
-class Equipamento(ABC):
+class Equipamento:
     id: int
     nome: str
     tipo: str
+    multa: MultaStrategy
     disponivel: bool = True
-    _estrategia_multa: EstrategiaMulta = field(default_factory=MultaDiariaPadrao, init=False)
-
-    def definir_estrategia_multa(self, estrategia: EstrategiaMulta):
-        """Permite mudar a estratégia em tempo de execução"""
-        self._estrategia_multa = estrategia
 
     def calcular_multa(self, dias_atraso: int) -> float:
-        return self._estrategia_multa.calcular(dias_atraso)
-
-
-@dataclass
-class Notebook(Equipamento):
-    pass
-
+        return self.multa.calcular(dias_atraso)
 
 @dataclass
-class Projetor(Equipamento):
-    pass
-
-
+class Notebook(Equipamento): pass
 @dataclass
-class Tablet(Equipamento):
-    pass
+class Projetor(Equipamento): pass
+@dataclass
+class Tablet(Equipamento): pass
