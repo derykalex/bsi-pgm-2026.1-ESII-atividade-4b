@@ -3,11 +3,12 @@ from datetime import date, timedelta
 from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.observer import Observer
 from servicos.servico_emprestimo import ServicoEmprestimo
+from modelos.equipamento_factory import EquipamentoFactory
 
 
+# Fake: repositório para testes
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
-        from modelos.equipamento_factory import EquipamentoFactory
         criar = EquipamentoFactory.criar_equipamento
         self.equipamentos = [
             criar("notebook", 1, "Notebook Dell"),
@@ -48,6 +49,7 @@ class RepositorioFake(IRepositorioEmprestimo):
         return len(self.emprestimos) + 1
 
 
+# Spy: agora é um Observer
 class NotificadorSpy(Observer):
     def __init__(self):
         self.eventos = []
@@ -60,9 +62,11 @@ class NotificadorSpy(Observer):
 def repositorio_fake():
     return RepositorioFake()
 
+
 @pytest.fixture
 def notificador_spy():
     return NotificadorSpy()
+
 
 @pytest.fixture
 def servico(repositorio_fake, notificador_spy):
