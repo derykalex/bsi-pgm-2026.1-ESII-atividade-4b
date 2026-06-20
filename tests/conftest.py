@@ -8,9 +8,10 @@ from servicos.servico_emprestimo import ServicoEmprestimo
 from servicos.evento import Evento
 
 
-# Fake: implementação funcional em memória
+# ==================== REPOSITORIO FAKE ====================
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
+        # Usando Strategy (Aula 11)
         self.equipamentos = [
             Notebook(1, "Notebook Dell", "notebook"),
             Projetor(2, "Projetor Epson", "projetor"),
@@ -50,7 +51,7 @@ class RepositorioFake(IRepositorioEmprestimo):
         return len(self.emprestimos) + 1
 
 
-# Spy: registra chamadas
+# ==================== NOTIFICADOR SPY ====================
 class NotificadorSpy(INotificador):
     def __init__(self):
         self.eventos = []
@@ -59,7 +60,7 @@ class NotificadorSpy(INotificador):
         self.eventos.append(evento)
 
 
-# Fixtures
+# ==================== FIXTURES ====================
 @pytest.fixture
 def repositorio_fake():
     return RepositorioFake()
