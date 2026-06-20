@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from modelos.emprestimo import Emprestimo
 from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.interfaces import INotificador
-from services.evento import Evento   # ← Novo import
+from servicos.evento import Evento
 
 
 class ServicoEmprestimo:
@@ -15,39 +15,31 @@ class ServicoEmprestimo:
         self.repositorio = repositorio
         self.notificador = notificador
 
-    # UC01 — Registrar empréstimo
-    def registrar(self, equip_id: int, nome: str, email: str, dias: int):
+    def registrar(self, equipamento_id: int, usuario_nome: str, usuario_email: str, dias: int):
+        equipamento = self.repositorio.buscar_equipamento(equipamento_id)
 
-        equipamento = self.repositorio.buscar_equipamento(equip_id)
-
-        if not equipamento:
-            return False
-
-        if not equipamento.disponivel:
+        if not equipamento or not equipamento.disponivel:
             return False
 
         emprestimo = Emprestimo(
             id=self.repositorio.proximo_id_emprestimo(),
-            equipamento_id=equip_id,
-            usuario_nome=nome,
-            usuario_email=email,
+            equipamento_id=equipamento_id,
+            usuario_nome=usuario_nome,
+            usuario_email=usuario_email,
             data_emprestimo=date.today(),
             data_devolucao=date.today() + timedelta(days=dias)
         )
 
         self.repositorio.salvar_emprestimo(emprestimo)
-        self.repositorio.marcar_indisponivel(equip_id)
+        self.repositorio.marcar_indisponivel(equipamento_id)
 
-        # Evento tipado (Aula 12)
         self.notificador.notificar(
-            Evento("emprestimo", email, data=emprestimo.data_devolucao)
+            Evento("emprestimo", usuario_email, data=emprestimo.data_devolucao)
         )
 
         return True
 
-    # UC02 — Registrar devolução
     def registrar_devolucao(self, emprestimo_id: int):
-
         emprestimo = self.repositorio.buscar_emprestimo(emprestimo_id)
 
         if not emprestimo or emprestimo.devolvido:
@@ -61,9 +53,7 @@ class ServicoEmprestimo:
             equipamento = self.repositorio.buscar_equipamento(emprestimo.equipamento_id)
             if equipamento:
                 multa = equipamento.calcular_multa(dias_atraso)
-                self.notificador.notificar(
-                    Evento("atraso", emprestimo.usuario_email)
-                )
+                self.notificador.notificar(Evento("atraso", emprestimo.usuario_email))
 
         self.repositorio.marcar_devolvido(emprestimo_id)
         self.repositorio.marcar_disponivel(emprestimo.equipamento_id)
@@ -74,7 +64,6 @@ class ServicoEmprestimo:
 
         return True
 
-    # UC03 — Listar atrasados
     def listar_atrasados(self):
         atrasados = self.repositorio.listar_em_atraso()
 
@@ -89,12 +78,13 @@ class ServicoEmprestimo:
             equipamento = self.repositorio.buscar_equipamento(emprestimo.equipamento_id)
             multa = equipamento.calcular_multa(dias_atraso) if equipamento else 0.0
 
-            print(
-                f"ID: {emprestimo.id} | Usuário: {emprestimo.usuario_nome} | "
-                f"Email: {emprestimo.usuario_email} | Devolução prevista: {emprestimo.data_devolucao} | "
-                f"Dias atraso: {dias_atraso} | Multa: R${multa:.2f}"
-            )
+            self._imprimir_linha_atraso(emprestimo, dias_atraso, multa)
+            self.notificador.notificar(Evento("atraso", emprestimo.usuario_email))
 
-            self.notificador.notificar(
-                Evento("atraso", emprestimo.usuario_email)
-            )
+    def _imprimir_linha_atraso(self, emprestimo, dias_atraso: int, multa: float):
+        """Método extraído (Extract Function) - Aula 12"""
+        print(
+            f"ID: {emprestimo.id} | Usuário: {emprestimo.usuario_nome} | "
+            f"Email: {emprestimo.usuario_email} | Devolução prevista: {emprestimo.data_devolucao} | "
+            f"Dias atraso: {dias_atraso} | Multa: R${multa:.2f}"
+        )
