@@ -6,17 +6,14 @@ from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
 from servicos.evento import Evento
-from modelos.multa_strategy import MultaComCarencia
 
 
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
-        # Estratégia de multa (Aula 11)
-        estrategia = MultaComCarencia()
         self.equipamentos = [
-            Notebook(1, "Notebook Dell", "notebook", multa=estrategia),
-            Projetor(2, "Projetor Epson", "projetor", multa=estrategia),
-            Tablet(3, "Tablet Samsung", "tablet", multa=estrategia)
+            Notebook(1, "Notebook Dell", "notebook"),
+            Projetor(2, "Projetor Epson", "projetor"),
+            Tablet(3, "Tablet Samsung", "tablet")
         ]
         self.emprestimos = []
 
