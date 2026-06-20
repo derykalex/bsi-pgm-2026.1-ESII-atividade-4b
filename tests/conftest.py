@@ -1,19 +1,20 @@
 import pytest
 from datetime import date, timedelta
+
+from modelos.equipamento import Notebook, Projetor, Tablet
 from repositorios.interfaces import IRepositorioEmprestimo
-from servicos.observer import Observer
+from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
-from modelos.equipamento_factory import EquipamentoFactory
+from servicos.evento import Evento
 
 
-# Fake: repositório para testes
+# Fake: implementação funcional em memória
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
-        criar = EquipamentoFactory.criar_equipamento
         self.equipamentos = [
-            criar("notebook", 1, "Notebook Dell"),
-            criar("projetor", 2, "Projetor Epson"),
-            criar("tablet", 3, "Tablet Samsung")
+            Notebook(1, "Notebook Dell", "notebook"),
+            Projetor(2, "Projetor Epson", "projetor"),
+            Tablet(3, "Tablet Samsung", "tablet")
         ]
         self.emprestimos = []
 
@@ -49,27 +50,24 @@ class RepositorioFake(IRepositorioEmprestimo):
         return len(self.emprestimos) + 1
 
 
-# Spy: agora é um Observer
-class NotificadorSpy(Observer):
+# Spy: registra chamadas
+class NotificadorSpy(INotificador):
     def __init__(self):
         self.eventos = []
 
-    def update(self, evento):
+    def notificar(self, evento: Evento):
         self.eventos.append(evento)
 
 
+# Fixtures
 @pytest.fixture
 def repositorio_fake():
     return RepositorioFake()
-
 
 @pytest.fixture
 def notificador_spy():
     return NotificadorSpy()
 
-
 @pytest.fixture
 def servico(repositorio_fake, notificador_spy):
-    s = ServicoEmprestimo(repositorio_fake)
-    s.registrar_observer(notificador_spy)
-    return s
+    return ServicoEmprestimo(repositorio_fake, notificador_spy)
