@@ -1,11 +1,11 @@
 from repositorios.repositorio_emprestimo import RepositorioEmprestimo
 from servicos.notificador import Notificador
 from servicos.servico_emprestimo import ServicoEmprestimo
-from modelos.multa_strategy import MultaComCarencia  # ou a estratégia padrão
 
 
 def test_fluxo_registrar_devolver_com_componentes_reais():
-    # Arrange — componentes REAIS
+    """Teste de integração com componentes reais"""
+    # Arrange
     repositorio = RepositorioEmprestimo()
     notificador = Notificador()
     servico = ServicoEmprestimo(repositorio, notificador)
