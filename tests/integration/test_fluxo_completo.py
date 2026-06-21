@@ -7,7 +7,7 @@ def test_fluxo_registrar_devolver_com_componentes_reais():
     """Teste de integração com componentes reais"""
     # Arrange
     repositorio = RepositorioEmprestimo()
-    notificador = Notificador()
+    notificador = Notificador()          # deve implementar INotificador
     servico = ServicoEmprestimo(repositorio, notificador)
 
     # Act
