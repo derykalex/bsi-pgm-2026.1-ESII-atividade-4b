@@ -76,9 +76,9 @@ class ServicoEmprestimo:
         for emprestimo in atrasados:
             dias_atraso = (date.today() - emprestimo.data_devolucao).days
             equipamento = self.repositorio.buscar_equipamento(emprestimo.equipamento_id)
-            multa = equipamento.calcular_multa(dias_atraso) if equipamento else 0.0
+            multa_calculada = equipamento.calcular_multa(dias_atraso) if equipamento else 0.0
 
-            self._imprimir_linha_atraso(emprestimo, dias_atraso, multa)
+            self._imprimir_linha_atraso(emprestimo, dias_atraso, multa_calculada)
             self.notificador.notificar(Evento("atraso", emprestimo.usuario_email))
 
     def _imprimir_linha_atraso(self, emprestimo, dias_atraso: int, multa: float):
