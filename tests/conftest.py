@@ -2,7 +2,6 @@ import pytest
 from datetime import date
 
 from modelos.equipamento import Notebook, Projetor, Tablet
-from modelos.multa_strategy import MultaPorDia
 from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
@@ -11,11 +10,10 @@ from servicos.evento import Evento
 
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
-        multa_padrao = MultaPorDia(10.0)
         self.equipamentos = [
-            Notebook(1, "Notebook Dell", "notebook", multa_padrao),
-            Projetor(2, "Projetor Epson", "projetor", multa_padrao),
-            Tablet(3, "Tablet Samsung", "tablet", multa_padrao)
+            Notebook(1, "Notebook Dell", "notebook"),
+            Projetor(2, "Projetor Epson", "projetor"),
+            Tablet(3, "Tablet Samsung", "tablet")
         ]
         self.emprestimos = []
 
@@ -55,8 +53,14 @@ class NotificadorSpy(INotificador):
     def __init__(self):
         self.eventos = []
 
-    def notificar(self, evento: Evento):
-        self.eventos.append(evento)
+    def notificar_emprestimo(self, email, data_devolucao):
+        self.eventos.append(Evento("emprestimo", email, data=data_devolucao))
+
+    def notificar_devolucao(self, email, multa):
+        self.eventos.append(Evento("devolucao", email, multa=multa))
+
+    def notificar_atraso(self, email):
+        self.eventos.append(Evento("atraso", email))
 
 
 @pytest.fixture
