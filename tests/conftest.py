@@ -55,14 +55,19 @@ class NotificadorSpy(INotificador):
     def __init__(self):
         self.eventos = []
 
+    def notificar(self, evento: Evento):
+        """Método compatível com o que ServicoEmprestimo chama"""
+        self.eventos.append(evento)
+
+    # Métodos abstratos obrigatórios (para satisfazer INotificador)
     def notificar_emprestimo(self, email, data_devolucao):
-        self.eventos.append(Evento("emprestimo", email, data=data_devolucao))
+        self.notificar(Evento("emprestimo", email, data=data_devolucao))
 
     def notificar_devolucao(self, email, multa):
-        self.eventos.append(Evento("devolucao", email, multa=multa))
+        self.notificar(Evento("devolucao", email, multa=multa))
 
     def notificar_atraso(self, email):
-        self.eventos.append(Evento("atraso", email))
+        self.notificar(Evento("atraso", email))
 
 
 @pytest.fixture
