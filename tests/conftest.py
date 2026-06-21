@@ -2,6 +2,7 @@ import pytest
 from datetime import date
 
 from modelos.equipamento import Notebook, Projetor, Tablet
+from modelos.multa_strategy import MultaPorDia
 from repositorios.interfaces import IRepositorioEmprestimo
 from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
@@ -10,10 +11,11 @@ from servicos.evento import Evento
 
 class RepositorioFake(IRepositorioEmprestimo):
     def __init__(self):
+        multa_padrao = MultaPorDia(10.0)
         self.equipamentos = [
-            Notebook(1, "Notebook Dell", "notebook"),
-            Projetor(2, "Projetor Epson", "projetor"),
-            Tablet(3, "Tablet Samsung", "tablet")
+            Notebook(id=1, nome="Notebook Dell", tipo="notebook", multa=multa_padrao),
+            Projetor(id=2, nome="Projetor Epson", tipo="projetor", multa=MultaPorDia(15.0)),
+            Tablet(id=3, nome="Tablet Samsung", tipo="tablet", multa=multa_padrao)
         ]
         self.emprestimos = []
 
