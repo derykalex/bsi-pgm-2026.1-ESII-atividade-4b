@@ -1,5 +1,5 @@
 from repositorios.repositorio_emprestimo import RepositorioEmprestimo
-from servicos.notificador_email import NotificadorEmail   # Use o que realmente funciona
+from servicos.notificador_email import NotificadorEmail
 from servicos.servico_emprestimo import ServicoEmprestimo
 
 
@@ -7,7 +7,7 @@ def test_fluxo_registrar_devolver_com_componentes_reais():
     """Teste de integração com componentes reais"""
     # Arrange
     repositorio = RepositorioEmprestimo()
-    notificador = NotificadorEmail()   # ← Mudança aqui
+    notificador = NotificadorEmail()
     servico = ServicoEmprestimo(repositorio, notificador)
 
     # Act
