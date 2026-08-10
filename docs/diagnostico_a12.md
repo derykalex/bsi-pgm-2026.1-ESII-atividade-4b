@@ -120,13 +120,4 @@ Ao final da implementação, a suíte apresentou:
 O pipeline do GitHub Actions também apresentou execução verde, confirmando que as alterações atuais estão passando pela suíte automatizada.
 
 
-### Depois de colar
 
-**Pare. Não coloque mais nada dentro do arquivo.**
-
-Vá até **Commit changes**.
-
-No campo **Commit message**, coloque:
-
-```text
-docs: completa diagnostico de code smells da Aula 12
