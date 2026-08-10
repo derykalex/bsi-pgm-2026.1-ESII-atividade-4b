@@ -2,122 +2,185 @@
 
 ## 1. Primitive Obsession
 
-**Arquivo:** `servicos/servico_emprestimo.py`
+**Arquivo:** `servicos/servico_emprestimo.py:51-55`
 
 **Smell:** Primitive Obsession
 
 **Situação:** identificado e corrigido.
 
-O evento utilizado pelo Observer era representado por um `dict`, fazendo com que os atributos fossem acessados por chaves. Isso dificultava a compreensão do contrato do evento e permitia erros de chave em tempo de execução.
+Na versão anterior do sistema, o evento utilizado pelo padrão Observer era representado por um `dict`. Essa representação utilizava chaves como `"tipo"`, `"email"`, `"data"` e `"multa"` sem um contrato explícito.
 
 **Refactoring aplicado:** Replace Primitive with Object.
 
-O `dict` foi substituído pela classe `Evento`, implementada com `@dataclass`.
-
-Agora os dados são acessados por atributos:
+O `dict` foi substituído pela classe `Evento`, implementada como `@dataclass`. Atualmente o serviço cria eventos tipados:
 
 ```python
-evento.tipo
-evento.email
-evento.data
-evento.multa
-2. Mysterious Name
+evento = Evento(
+    tipo="emprestimo",
+    email=usuario_email,
+    data=data_devolucao
+)
+```
 
-Arquivo: tests/conftest.py
+Agora os dados são acessados por atributos, como `evento.tipo`, `evento.email`, `evento.data` e `evento.multa`.
 
-Smell: Mysterious Name
+Essa alteração melhora a legibilidade e reduz a possibilidade de erros causados por chaves incorretas.
 
-Situação: corrigido.
+---
 
-O parâmetro equip_id possuía uma abreviação que não expressava completamente sua finalidade.
+## 2. Mysterious Name
 
-Refactoring aplicado: Rename.
+**Arquivo:** `tests/conftest.py:40`
 
-O nome foi alterado para:
+**Smell:** Mysterious Name
 
+**Situação:** identificado e corrigido.
+
+O parâmetro utilizado anteriormente era chamado `equip_id`. A abreviação não deixava completamente explícito que o valor representava o identificador de um equipamento.
+
+**Refactoring aplicado:** Rename.
+
+O parâmetro foi alterado para:
+
+```python
 equipamento_id
+```
 
-A alteração torna o código mais legível e deixa explícito que o valor representa o identificador de um equipamento.
+A alteração torna o código mais legível e deixa explícita a finalidade do parâmetro.
 
-3. Duplicated Code
+---
 
-Arquivo: servicos/notificador_email.py
+## 3. Long Method
 
-Smell: Duplicated Code
+**Arquivo:** `servicos/servico_emprestimo.py:105-141`
 
-Situação: identificado.
+**Smell:** Long Method
 
-Os diferentes tipos de notificação possuem estruturas semelhantes e trabalham com os mesmos dados do evento.
+**Situação:** identificado e corrigido parcialmente.
 
-A utilização da classe Evento centraliza a representação das informações e permite que a notificação trabalhe sobre uma estrutura comum.
+O método `listar_atrasados()` concentrava diversas responsabilidades: consultar os empréstimos atrasados, localizar equipamentos, calcular dias de atraso, calcular a multa, imprimir informações e enviar notificações.
 
-Refactoring aplicado: Replace Primitive with Object.
+**Refactoring aplicado:** Extract Function.
 
-A representação única do evento reduz a duplicação da estrutura de dados utilizada pelas notificações.
+A parte responsável pela impressão das informações de atraso foi extraída para o método:
 
-4. Comments
+```python
+_imprimir_linha_atraso()
+```
 
-Arquivo: servicos/servico_emprestimo.py
+A extração separa os detalhes de apresentação do fluxo principal de `listar_atrasados()`.
 
-Smell: Comments
+Com isso, o método principal fica mais organizado e sua intenção é mais fácil de compreender.
 
-Situação: analisado.
+---
 
-Comentários que apenas explicam operações já evidentes podem indicar que o código não expressa claramente sua intenção.
+## 4. Comments
 
-A criação da função _imprimir_linha_atraso() melhora a comunicação da intenção do código pelo próprio nome da função.
+**Arquivo:** `servicos/servico_emprestimo.py:143-153`
 
-Refactoring aplicado: Extract Function.
+**Smell:** Comments
 
-A impressão dos dados de atraso foi separada da lógica principal de listar_atrasados().
+**Situação:** identificado e corrigido.
 
-5. Feature Envy
+Comentários que apenas explicam o que o código está fazendo podem indicar que a intenção da operação não está suficientemente clara no próprio código.
 
-Arquivo: servicos/servico_emprestimo.py
+Neste caso, a responsabilidade de imprimir os dados do atraso foi extraída para uma função cujo próprio nome explica sua finalidade:
 
-Smell: Feature Envy
+```python
+_imprimir_linha_atraso()
+```
 
-Situação: analisado.
+**Refactoring aplicado:** Extract Function.
 
-O serviço precisa consultar informações do equipamento para calcular a multa. A regra de cálculo permanece concentrada no próprio equipamento e na estratégia de multa.
+A utilização de um nome significativo para a função reduz a necessidade de comentários explicativos sobre uma operação simples.
 
-O cálculo é realizado por:
+A própria estrutura do código passa a comunicar sua intenção.
 
-equipamento.calcular_multa(dias_atraso)
+---
 
-Dessa forma, o serviço coordena a operação enquanto a regra de cálculo permanece encapsulada no objeto responsável.
+## 5. Feature Envy
 
-Decisão: manter a delegação existente.
+**Arquivo:** `servicos/servico_emprestimo.py:83-85`
 
-6. Data Class — falso positivo
+**Smell:** Feature Envy
 
-Arquivo: modelos/equipamento.py
+**Situação:** analisado.
 
-Smell aparente: Data Class
+O serviço precisa utilizar informações do equipamento para calcular a multa:
 
-Situação: falso positivo — não refatorar.
+```python
+multa = equipamento.calcular_multa(
+    dias_atraso
+)
+```
 
-As classes Notebook, Projetor e Tablet possuem estrutura simples e podem aparentar um Data Class Smell.
+A regra de cálculo, entretanto, está encapsulada no próprio objeto `Equipamento`, que delega o cálculo para a estratégia de multa.
 
-Entretanto, elas representam tipos diferentes de equipamento utilizados pelo sistema. Essas classes fazem parte da estrutura criada anteriormente com Strategy e Factory.
+**Refactoring considerado:** Move Function.
 
-Aplicar Inline Class poderia remover uma distinção importante do domínio e prejudicar a estrutura desenvolvida na Aula 11.
+Apesar da possibilidade de mover parte da lógica para outro objeto, a implementação atual mantém o serviço como coordenador do caso de uso e deixa a regra de cálculo encapsulada em `Equipamento` e `MultaStrategy`.
 
-Portanto, a decisão foi manter as classes e registrar o caso como falso positivo.
+**Decisão:** manter a implementação atual.
 
-Conclusão
+Neste caso, a delegação existente mantém uma separação adequada entre a coordenação do empréstimo e a regra de cálculo da multa.
 
-A principal melhoria realizada na Aula 12 foi substituir a representação do evento baseada em dict por uma @dataclass Evento.
+---
 
-Também foram realizados Rename e Extract Function, mantendo o comportamento observável do sistema.
+## 6. Data Class — falso positivo
 
-Os testes automatizados foram utilizados como mecanismo de segurança durante as alterações.
+**Arquivo:** `modelos/equipamento.py:15-20`
 
-Ao final da implementação, a suíte apresentou:
+**Smell aparente:** Data Class
 
+**Situação:** falso positivo — não refatorado.
+
+As classes `Notebook`, `Projetor` e `Tablet` possuem estrutura simples e não adicionam métodos próprios:
+
+```python
+@dataclass
+class Notebook(Equipamento): pass
+
+@dataclass
+class Projetor(Equipamento): pass
+
+@dataclass
+class Tablet(Equipamento): pass
+```
+
+À primeira vista, essas classes podem aparentar um Data Class Smell.
+
+Entretanto, elas representam tipos distintos de equipamento utilizados pelo domínio do sistema. A distinção entre Notebook, Projetor e Tablet é necessária para a estrutura criada anteriormente com Factory e Strategy.
+
+**Refactoring considerado:** Inline Class.
+
+A aplicação de Inline Class eliminaria essas subclasses e removeria uma distinção importante do domínio. Isso também poderia desfazer parte da estrutura desenvolvida nas aulas anteriores.
+
+**Decisão:** não refatorar.
+
+O caso foi registrado como falso positivo porque a estrutura aparentemente simples das classes possui uma finalidade arquitetural no sistema.
+
+---
+
+# Conclusão
+
+O diagnóstico realizado na Aula 12 identificou seis situações relacionadas a Code Smells.
+
+Os principais refactorings realizados foram:
+
+- Replace Primitive with Object;
+- Rename;
+- Extract Function.
+
+A principal alteração foi substituir a representação do evento baseada em `dict` pela classe `Evento`, implementada com `@dataclass`.
+
+Também foi realizado o Rename de `equip_id` para `equipamento_id` e o Extract Function da impressão dos dados de atraso para `_imprimir_linha_atraso()`.
+
+O possível Data Class nas subclasses `Notebook`, `Projetor` e `Tablet` foi analisado como falso positivo e não foi refatorado, pois essas classes representam tipos distintos do domínio.
+
+Os testes automatizados foram utilizados como rede de segurança durante as alterações. Ao final da implementação, a suíte apresentou:
+
+```text
 22 passed
+```
 
-O pipeline do GitHub Actions também apresentou execução verde, confirmando que as alterações atuais estão passando pela suíte automatizada.
-
-
-
+O pipeline do GitHub Actions também apresentou execução verde após as alterações, indicando que a suíte automatizada estava passando.
