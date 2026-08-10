@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 from servicos.evento import Evento
 
 
 class Observer(ABC):
     @abstractmethod
-    def update(self, evento: Evento) -> None: ...
+    def update(self, evento: Evento) -> None:
+        ...
 
 
 class Subject:
