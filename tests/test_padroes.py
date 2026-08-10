@@ -56,7 +56,7 @@ def test_multa_com_carencia_com_atraso():
 
 
 def test_notificador_emprestimo(capsys):
-    notificador = Notificador.__new__(Notificador)
+    notificador = Notificador()
 
     evento = Evento(
         tipo="emprestimo",
@@ -73,7 +73,7 @@ def test_notificador_emprestimo(capsys):
 
 
 def test_notificador_devolucao(capsys):
-    notificador = Notificador.__new__(Notificador)
+    notificador = Notificador()
 
     evento = Evento(
         tipo="devolucao",
@@ -89,7 +89,7 @@ def test_notificador_devolucao(capsys):
 
 
 def test_notificador_atraso(capsys):
-    notificador = Notificador.__new__(Notificador)
+    notificador = Notificador()
 
     evento = Evento(
         tipo="atraso",
@@ -105,6 +105,7 @@ def test_notificador_atraso(capsys):
 
 
 class ObservadorTeste(Observador):
+
     def __init__(self):
         self.evento = None
         self.dados = None
