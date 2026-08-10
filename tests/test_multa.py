@@ -1,4 +1,4 @@
-from multa import calcular_multa_com_carencia, calcular_desconto_antecipado
+from multa import calcular_desconto_antecipado, calcular_multa_com_carencia
 
 
 def test_atraso_zero_nao_gera_multa():
