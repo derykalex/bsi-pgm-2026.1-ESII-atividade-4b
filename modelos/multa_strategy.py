@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
 
+
 class MultaStrategy(ABC):
     @abstractmethod
-    def calcular(self, dias_atraso: int) -> float: ...
+    def calcular(self, dias_atraso: int) -> float:
+        ...
+
 
 class MultaPorDia(MultaStrategy):
     def __init__(self, valor_dia: float):
