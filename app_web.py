@@ -10,6 +10,7 @@ st.set_page_config(
     layout="wide",
 )
 
+
 st.title("📚 Sistema de Empréstimos - UFRA Paragominas")
 st.markdown("### Refatorado com Factory, Facade, Strategy e Observer")
 
@@ -33,11 +34,13 @@ menu = st.sidebar.selectbox(
 )
 
 
+# Página inicial
 if menu == "🏠 Início":
     st.success("Sistema funcionando com padrões de projeto modernos!")
     st.info("Use o menu lateral para navegar.")
 
 
+# Registrar empréstimo
 elif menu == "📝 Registrar Empréstimo":
     st.subheader("Novo Empréstimo")
 
@@ -50,17 +53,22 @@ elif menu == "📝 Registrar Empréstimo":
             value=1,
             step=1,
         )
+
         nome = st.text_input("Nome do Usuário")
 
     with col2:
         email = st.text_input("Email do Usuário")
+
         dias = st.number_input(
             "Dias para Devolução",
             min_value=1,
             value=7,
         )
 
-    if st.button("✅ Registrar Empréstimo", type="primary"):
+    if st.button(
+        "✅ Registrar Empréstimo",
+        type="primary",
+    ):
         sucesso = sistema.registrar(
             equip_id,
             nome,
@@ -78,6 +86,7 @@ elif menu == "📝 Registrar Empréstimo":
             )
 
 
+# Registrar devolução
 elif menu == "🔄 Registrar Devolução":
     st.subheader("Registrar Devolução")
 
@@ -87,15 +96,25 @@ elif menu == "🔄 Registrar Devolução":
         value=1,
     )
 
-    if st.button("🔄 Registrar Devolução", type="primary"):
-        sucesso = sistema.registrar_devolucao(emprestimo_id)
+    if st.button(
+        "🔄 Registrar Devolução",
+        type="primary",
+    ):
+        sucesso = sistema.registrar_devolucao(
+            emprestimo_id
+        )
 
         if sucesso:
-            st.success("✅ Devolução registrada com sucesso!")
+            st.success(
+                "✅ Devolução registrada com sucesso!"
+            )
         else:
-            st.error("❌ Empréstimo inválido ou já devolvido.")
+            st.error(
+                "❌ Empréstimo inválido ou já devolvido."
+            )
 
 
+# Empréstimos em atraso
 elif menu == "⏰ Empréstimos em Atraso":
     st.subheader("Empréstimos em Atraso")
 
@@ -105,7 +124,9 @@ elif menu == "⏰ Empréstimos em Atraso":
         atrasados = []
 
     if not atrasados:
-        st.info("Nenhum empréstimo em atraso no momento.")
+        st.info(
+            "Nenhum empréstimo em atraso no momento."
+        )
     else:
         for emp in atrasados:
             st.warning(
@@ -114,4 +135,5 @@ elif menu == "⏰ Empréstimos em Atraso":
             )
 
 
+# Rodapé
 st.sidebar.success("App funcional criado!")
