@@ -1,11 +1,8 @@
-# Notificador: responsável pela comunicação com o usuário.
-
-from servicos.interfaces import INotificador
 from servicos.evento import Evento
+from servicos.interfaces import INotificador
 
 
 class Notificador(INotificador):
-
     def notificar_emprestimo(self, email, data_devolucao):
         print(
             f"[EMAIL] Empréstimo registrado para {email}. "
@@ -32,16 +29,16 @@ class Notificador(INotificador):
         if evento.tipo == "emprestimo":
             self.notificar_emprestimo(
                 evento.email,
-                evento.data
+                evento.data,
             )
 
         elif evento.tipo == "devolucao":
             self.notificar_devolucao(
                 evento.email,
-                evento.multa
+                evento.multa,
             )
 
         elif evento.tipo == "atraso":
             self.notificar_atraso(
-                evento.email
+                evento.email,
             )
