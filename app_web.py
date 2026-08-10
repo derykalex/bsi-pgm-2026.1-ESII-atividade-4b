@@ -5,17 +5,14 @@ from app.sistema import SistemaDeEmprestimos
 
 # Configuração da página
 st.set_page_config(
-    page_title="Sistema de Empréstimos UFRA",
-    page_icon="📚",
+    page_title="Sistema de Empréstimos",
     layout="wide",
 )
 
-
 st.title("📚 Sistema de Empréstimos - UFRA Paragominas")
-st.markdown("### Refatorado com Factory, Facade, Strategy e Observer")
 
 
-# Inicializa o sistema usando a Facade
+# Inicializa o sistema (Facade)
 if "sistema" not in st.session_state:
     st.session_state.sistema = SistemaDeEmprestimos()
 
@@ -23,25 +20,18 @@ sistema = st.session_state.sistema
 
 
 # Menu lateral
-menu = st.sidebar.selectbox(
-    "Escolha uma funcionalidade",
+opcao = st.sidebar.selectbox(
+    "Escolha uma opção",
     [
-        "🏠 Início",
-        "📝 Registrar Empréstimo",
-        "🔄 Registrar Devolução",
-        "⏰ Empréstimos em Atraso",
+        "Registrar Empréstimo",
+        "Registrar Devolução",
+        "Empréstimos em Atraso",
+        "Equipamentos",
     ],
 )
 
 
-# Página inicial
-if menu == "🏠 Início":
-    st.success("Sistema funcionando com padrões de projeto modernos!")
-    st.info("Use o menu lateral para navegar.")
-
-
-# Registrar empréstimo
-elif menu == "📝 Registrar Empréstimo":
+if opcao == "Registrar Empréstimo":
     st.subheader("Novo Empréstimo")
 
     col1, col2 = st.columns(2)
@@ -51,24 +41,20 @@ elif menu == "📝 Registrar Empréstimo":
             "ID do Equipamento",
             min_value=1,
             value=1,
-            step=1,
         )
 
         nome = st.text_input("Nome do Usuário")
 
     with col2:
-        email = st.text_input("Email do Usuário")
+        email = st.text_input("Email")
 
         dias = st.number_input(
-            "Dias para Devolução",
+            "Dias de Empréstimo",
             min_value=1,
             value=7,
         )
 
-    if st.button(
-        "✅ Registrar Empréstimo",
-        type="primary",
-    ):
+    if st.button("Registrar Empréstimo"):
         sucesso = sistema.registrar(
             equip_id,
             nome,
@@ -77,63 +63,40 @@ elif menu == "📝 Registrar Empréstimo":
         )
 
         if sucesso:
-            st.success(
-                f"Empréstimo registrado com sucesso para {nome}!"
-            )
+            st.success("✅ Empréstimo registrado com sucesso!")
         else:
-            st.error(
-                "❌ Equipamento não encontrado ou indisponível."
-            )
+            st.error("❌ Equipamento indisponível ou inexistente.")
 
 
-# Registrar devolução
-elif menu == "🔄 Registrar Devolução":
-    st.subheader("Registrar Devolução")
+elif opcao == "Registrar Devolução":
+    st.subheader("Devolução de Empréstimo")
 
-    emprestimo_id = st.number_input(
+    emp_id = st.number_input(
         "ID do Empréstimo",
         min_value=1,
-        value=1,
     )
 
-    if st.button(
-        "🔄 Registrar Devolução",
-        type="primary",
-    ):
-        sucesso = sistema.registrar_devolucao(
-            emprestimo_id
-        )
+    if st.button("Registrar Devolução"):
+        sucesso = sistema.registrar_devolucao(emp_id)
 
         if sucesso:
-            st.success(
-                "✅ Devolução registrada com sucesso!"
-            )
+            st.success("✅ Devolução registrada!")
         else:
-            st.error(
-                "❌ Empréstimo inválido ou já devolvido."
-            )
+            st.error("❌ Empréstimo inválido.")
 
 
-# Empréstimos em atraso
-elif menu == "⏰ Empréstimos em Atraso":
-    st.subheader("Empréstimos em Atraso")
+elif opcao == "Empréstimos em Atraso":
+    st.subheader("📅 Empréstimos em Atraso")
 
-    if hasattr(sistema, "_servico"):
-        atrasados = sistema._servico.repositorio.listar_em_atraso()
-    else:
-        atrasados = []
-
-    if not atrasados:
-        st.info(
-            "Nenhum empréstimo em atraso no momento."
-        )
-    else:
-        for emp in atrasados:
-            st.warning(
-                f"ID {emp.id} - {emp.usuario_nome} - "
-                f"Devolução prevista: {emp.data_devolucao}"
-            )
+    sistema.listar_atrasados()
 
 
-# Rodapé
-st.sidebar.success("App funcional criado!")
+elif opcao == "Equipamentos":
+    st.subheader("Equipamentos Cadastrados")
+
+    st.info("Consulta de equipamentos disponível em breve.")
+
+
+st.sidebar.info(
+    "Sistema refatorado com Factory, Facade, Strategy e Observer"
+)
