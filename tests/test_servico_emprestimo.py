@@ -43,8 +43,11 @@ def test_registrar_notifica_usuario_apos_sucesso(
     )
 
     assert len(notificador_spy.eventos) == 1
-    assert notificador_spy.eventos[0].tipo == "emprestimo"
-    assert notificador_spy.eventos[0].email == "ana@test.com"
+
+    evento = notificador_spy.eventos[0]
+
+    assert evento.tipo == "emprestimo"
+    assert evento.email == "ana@test.com"
 
 
 def test_devolver_calcula_multa_correta_para_atraso(
@@ -69,15 +72,15 @@ def test_devolver_calcula_multa_correta_para_atraso(
 
     assert sucesso is True
 
-    assert len(notificador_spy.eventos) == 3
+    assert len(notificador_spy.eventos) == 2
 
-    assert notificador_spy.eventos[0].tipo == "emprestimo"
-    assert notificador_spy.eventos[1].tipo == "atraso"
-    assert notificador_spy.eventos[2].tipo == "devolucao"
+    evento_emprestimo = notificador_spy.eventos[0]
+    evento_devolucao = notificador_spy.eventos[1]
 
-    assert notificador_spy.eventos[1].email == "ana@test.com"
-    assert notificador_spy.eventos[2].email == "ana@test.com"
-    assert notificador_spy.eventos[2].multa == 30.0
+    assert evento_emprestimo.tipo == "emprestimo"
+    assert evento_devolucao.tipo == "devolucao"
+    assert evento_devolucao.email == "ana@test.com"
+    assert evento_devolucao.multa == 30.0
 
 
 def test_devolver_marca_equipamento_como_disponivel(
@@ -127,6 +130,11 @@ def test_listar_atrasados_notifica_evento_de_atraso(
     servico.listar_atrasados()
 
     assert len(notificador_spy.eventos) == 2
-    assert notificador_spy.eventos[0].tipo == "emprestimo"
-    assert notificador_spy.eventos[1].tipo == "atraso"
-    assert notificador_spy.eventos[1].email == "ana@test.com"
+
+    evento_emprestimo = notificador_spy.eventos[0]
+    evento_atraso = notificador_spy.eventos[1]
+
+    assert evento_emprestimo.tipo == "emprestimo"
+    assert evento_atraso.tipo == "atraso"
+    assert evento_atraso.email == "ana@test.com"
+    assert evento_atraso.multa == 20.0
