@@ -106,5 +106,15 @@ O uso de `dict` como evento é um **code smell** (Primitive Obsession), mas foi 
 
 ---
 
+# Reflexões — Aula 12
 
+A suíte de testes teve um papel importante durante os refactorings realizados na Aula 12. As alterações modificaram a estrutura interna do sistema, principalmente na representação dos eventos, mas os testes permitiram verificar se o comportamento esperado continuava funcionando.
+
+Durante a substituição do `dict` pela classe `Evento`, os testes ajudaram a identificar que a mudança não poderia alterar o comportamento das operações de empréstimo, devolução e atraso. Um exemplo ocorreu quando a expectativa do teste passou a considerar três eventos, enquanto a implementação produzia dois. A falha do teste permitiu identificar a diferença e corrigir a expectativa para ficar de acordo com o comportamento implementado.
+
+Ao final das alterações, a suíte apresentou 22 testes aprovados, demonstrando que as funcionalidades testadas continuaram funcionando.
+
+Também foi analisado o possível Code Smell Data Class nas classes `Notebook`, `Projetor` e `Tablet`. A decisão foi não aplicar a refatoração, pois essas classes representam tipos diferentes de equipamentos e fazem parte da estrutura criada anteriormente com Strategy e Factory. Nesse caso, o diagnóstico foi considerado um falso positivo.
+
+Assim, os testes funcionaram como uma rede de segurança para realizar os refactorings com menor risco de regressão, enquanto a análise dos Code Smells ajudou a diferenciar problemas reais de situações em que a estrutura existente deveria ser preservada.
 
