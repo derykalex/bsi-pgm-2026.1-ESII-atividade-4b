@@ -1,6 +1,8 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   test:
@@ -12,7 +14,7 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Instalar dependências
         run: |
@@ -22,6 +24,10 @@ jobs:
       - name: Configurar PYTHONPATH
         run: |
           echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+
+      - name: Executar lint
+        run: |
+          ruff check .
 
       - name: Executar testes
         run: |
