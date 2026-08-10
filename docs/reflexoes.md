@@ -118,8 +118,5 @@ Também foi analisado o possível Code Smell Data Class nas classes `Notebook`, 
 
 Assim, os testes funcionaram como uma rede de segurança para realizar os refactorings com menor risco de regressão, enquanto a análise dos Code Smells ajudou a diferenciar problemas reais de situações em que a estrutura existente deveria ser preservada.
 
-# Arquivo:linha
-Smell
-Refactoring proposto
-Justificativa
+
 
