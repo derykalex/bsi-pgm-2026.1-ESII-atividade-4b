@@ -2,7 +2,6 @@ import streamlit as st
 
 from app.sistema import SistemaDeEmprestimos
 
-
 st.set_page_config(
     page_title="Sistema de Empréstimos",
     layout="wide",
