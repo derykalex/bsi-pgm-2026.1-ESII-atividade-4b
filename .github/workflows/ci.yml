@@ -25,7 +25,11 @@ jobs:
         run: |
           echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
 
-      - name: Executar lint
+      - name: Corrigir lint com Ruff
+        run: |
+          ruff check . --fix
+
+      - name: Verificar lint
         run: |
           ruff check .
 
