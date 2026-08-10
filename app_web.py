@@ -1,3 +1,5 @@
+# ruff: noqa: I001
+
 import streamlit as st
 
 from app.sistema import SistemaDeEmprestimos
