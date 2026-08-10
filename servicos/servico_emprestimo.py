@@ -1,141 +1,153 @@
 from datetime import date, timedelta
 
-
-def test_registrar_devolve_true_quando_equipamento_disponivel(
-    servico,
-    repositorio_fake
-):
-    resultado = servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
-
-    assert resultado is True
+from modelos.emprestimo import Emprestimo
+from servicos.evento import Evento
 
 
-def test_registrar_devolve_false_quando_equipamento_indisponivel(
-    servico,
-    repositorio_fake
-):
-    repositorio_fake.marcar_indisponivel(1)
+class ServicoEmprestimo:
+    def __init__(self, repositorio, notificador):
+        self.repositorio = repositorio
+        self.notificador = notificador
 
-    resultado = servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
+    def registrar(
+        self,
+        equipamento_id,
+        usuario_nome,
+        usuario_email,
+        dias
+    ):
+        equipamento = self.repositorio.buscar_equipamento(
+            equipamento_id
+        )
 
-    assert resultado is False
+        if equipamento is None:
+            return False
 
+        if not equipamento.disponivel:
+            return False
 
-def test_registrar_notifica_usuario_apos_sucesso(
-    servico,
-    notificador_spy
-):
-    servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
+        data_emprestimo = date.today()
+        data_devolucao = (
+            data_emprestimo + timedelta(days=dias)
+        )
 
-    assert len(notificador_spy.eventos) == 1
+        emprestimo = Emprestimo(
+            id=self.repositorio.proximo_id_emprestimo(),
+            equipamento_id=equipamento_id,
+            usuario_nome=usuario_nome,
+            usuario_email=usuario_email,
+            data_emprestimo=data_emprestimo,
+            data_devolucao=data_devolucao
+        )
 
-    evento = notificador_spy.eventos[0]
+        self.repositorio.salvar_emprestimo(
+            emprestimo
+        )
 
-    assert evento.tipo == "emprestimo"
-    assert evento.email == "ana@test.com"
+        self.repositorio.marcar_indisponivel(
+            equipamento_id
+        )
 
+        evento = Evento(
+            tipo="emprestimo",
+            email=usuario_email,
+            data=data_devolucao
+        )
 
-def test_devolver_calcula_multa_correta_para_atraso(
-    servico,
-    repositorio_fake,
-    notificador_spy
-):
-    servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
+        self.notificador.notificar(evento)
 
-    emprestimo = repositorio_fake.buscar_emprestimo(1)
+        return True
 
-    emprestimo.data_devolucao = (
-        date.today() - timedelta(days=3)
-    )
+    def registrar_devolucao(self, emprestimo_id):
+        emprestimo = self.repositorio.buscar_emprestimo(
+            emprestimo_id
+        )
 
-    sucesso = servico.registrar_devolucao(1)
+        if emprestimo is None:
+            return False
 
-    assert sucesso is True
+        equipamento = self.repositorio.buscar_equipamento(
+            emprestimo.equipamento_id
+        )
 
-    # O empréstimo gera um evento e a devolução gera outro.
-    assert len(notificador_spy.eventos) == 2
+        if equipamento is None:
+            return False
 
-    evento_emprestimo = notificador_spy.eventos[0]
-    evento_devolucao = notificador_spy.eventos[1]
+        hoje = date.today()
 
-    assert evento_emprestimo.tipo == "emprestimo"
-    assert evento_devolucao.tipo == "devolucao"
-    assert evento_devolucao.email == "ana@test.com"
-    assert evento_devolucao.multa == 30.0
+        dias_atraso = max(
+            0,
+            (hoje - emprestimo.data_devolucao).days
+        )
 
+        multa = equipamento.calcular_multa(
+            dias_atraso
+        )
 
-def test_devolver_marca_equipamento_como_disponivel(
-    servico,
-    repositorio_fake
-):
-    servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
+        self.repositorio.marcar_devolvido(
+            emprestimo_id
+        )
 
-    servico.registrar_devolucao(1)
+        self.repositorio.marcar_disponivel(
+            emprestimo.equipamento_id
+        )
 
-    equipamento = repositorio_fake.buscar_equipamento(1)
+        evento = Evento(
+            tipo="devolucao",
+            email=emprestimo.usuario_email,
+            multa=multa
+        )
 
-    assert equipamento.disponivel is True
+        self.notificador.notificar(evento)
 
+        return True
 
-def test_devolver_falha_silenciosamente_para_emprestimo_inexistente(
-    servico
-):
-    resultado = servico.registrar_devolucao(999)
+    def listar_atrasados(self):
+        emprestimos_atrasados = (
+            self.repositorio.listar_em_atraso()
+        )
 
-    assert resultado is False
+        for emprestimo in emprestimos_atrasados:
+            equipamento = self.repositorio.buscar_equipamento(
+                emprestimo.equipamento_id
+            )
 
+            if equipamento is None:
+                continue
 
-def test_listar_atrasados_notifica_evento_de_atraso(
-    servico,
-    repositorio_fake,
-    notificador_spy
-):
-    servico.registrar(
-        1,
-        "Ana",
-        "ana@test.com",
-        7
-    )
+            dias_atraso = max(
+                0,
+                (date.today() - emprestimo.data_devolucao).days
+            )
 
-    emprestimo = repositorio_fake.buscar_emprestimo(1)
+            multa = equipamento.calcular_multa(
+                dias_atraso
+            )
 
-    emprestimo.data_devolucao = (
-        date.today() - timedelta(days=2)
-    )
+            self._imprimir_linha_atraso(
+                emprestimo,
+                dias_atraso,
+                multa
+            )
 
-    servico.listar_atrasados()
+            evento = Evento(
+                tipo="atraso",
+                email=emprestimo.usuario_email,
+                multa=multa
+            )
 
-    assert len(notificador_spy.eventos) == 2
+            self.notificador.notificar(evento)
 
-    evento_emprestimo = notificador_spy.eventos[0]
-    evento_atraso = notificador_spy.eventos[1]
+        return emprestimos_atrasados
 
-    assert evento_emprestimo.tipo == "emprestimo"
-    assert evento_atraso.tipo == "atraso"
-    assert evento_atraso.email == "ana@test.com"
-    assert evento_atraso.multa == 20.0
+    def _imprimir_linha_atraso(
+        self,
+        emprestimo,
+        dias_atraso,
+        multa
+    ):
+        print(
+            f"Usuário {emprestimo.usuario_nome} "
+            f"está atrasado {dias_atraso} dia(s). "
+            f"Multa: R${multa:.2f}"
+        )
