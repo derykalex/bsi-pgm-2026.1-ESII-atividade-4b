@@ -1,5 +1,7 @@
 import streamlit as st
+
 from app.sistema import SistemaDeEmprestimos
+
 
 # Configuração da página
 st.set_page_config(
