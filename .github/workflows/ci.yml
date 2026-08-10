@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Baixar código
+        uses: actions/checkout@v4
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -25,14 +26,14 @@ jobs:
         run: |
           echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
 
-      - name: Corrigir lint com Ruff
-        run: |
-          ruff check . --fix
-
-      - name: Verificar lint
-        run: |
-          ruff check .
-
       - name: Executar testes
         run: |
-          pytest tests/ --cov=. --cov-report=term-missing
+          pytest
+
+      - name: Verificar cobertura mínima
+        run: |
+          pytest --cov=. --cov-report=term-missing --cov-fail-under=80
+
+      - name: Verificar código com Ruff
+        run: |
+          ruff check .
