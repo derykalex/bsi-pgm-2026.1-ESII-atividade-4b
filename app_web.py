@@ -1,7 +1,5 @@
 import streamlit as st
-
 from app.sistema import SistemaDeEmprestimos
-
 
 # Configuração da página
 st.set_page_config(
@@ -99,7 +97,6 @@ elif menu == "🔄 Registrar Devolução":
 elif menu == "⏰ Empréstimos em Atraso":
     st.subheader("Empréstimos em Atraso")
 
-    # Consulta os empréstimos em atraso pelo serviço do sistema.
     if hasattr(sistema, "_servico"):
         atrasados = sistema._servico.repositorio.listar_em_atraso()
     else:
