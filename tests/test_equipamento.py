@@ -1,4 +1,5 @@
 import pytest
+
 from modelos.equipamento_factory import EquipamentoFactory
 
 
