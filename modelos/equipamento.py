@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+
 from modelos.multa_strategy import MultaStrategy
+
 
 @dataclass
 class Equipamento:
@@ -12,9 +14,17 @@ class Equipamento:
     def calcular_multa(self, dias_atraso: int) -> float:
         return self.multa.calcular(dias_atraso)
 
+
 @dataclass
-class Notebook(Equipamento): pass
+class Notebook(Equipamento):
+    pass
+
+
 @dataclass
-class Projetor(Equipamento): pass
+class Projetor(Equipamento):
+    pass
+
+
 @dataclass
-class Tablet(Equipamento): pass
+class Tablet(Equipamento):
+    pass
