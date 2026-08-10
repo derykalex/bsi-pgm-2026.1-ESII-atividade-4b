@@ -1,5 +1,11 @@
 [tool.coverage.run]
-omit = ["main.py", "tests/*"]
+omit = [
+    "main.py",
+    "app_web.py",
+    "tests/*",
+    "servicos/interfaces.py",
+    "repositorios/interfaces.py"
+]
 
 [tool.ruff]
 line-length = 100
