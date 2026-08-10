@@ -1,12 +1,13 @@
-import pytest
 from datetime import date
+
+import pytest
 
 from modelos.equipamento import Notebook, Projetor, Tablet
 from modelos.multa_strategy import MultaPorDia
 from repositorios.interfaces import IRepositorioEmprestimo
+from servicos.evento import Evento
 from servicos.interfaces import INotificador
 from servicos.servico_emprestimo import ServicoEmprestimo
-from servicos.evento import Evento
 
 
 class RepositorioFake(IRepositorioEmprestimo):
