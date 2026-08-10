@@ -14,7 +14,7 @@ O evento utilizado pelo Observer era representado por um `dict`, fazendo com que
 
 O `dict` foi substituído pela classe `Evento`, implementada com `@dataclass`.
 
-Agora os dados são acessados por atributos, como:
+Agora os dados são acessados por atributos:
 
 ```python
 evento.tipo
