@@ -10,20 +10,22 @@ class ServicoEmprestimo:
         equipamento = self.repositorio.buscar_equipamento(equipamento_id)
 
         if equipamento is None:
-            raise ValueError("Equipamento não encontrado.")
+            return False
 
         if not equipamento.disponivel:
-            raise ValueError("Equipamento indisponível.")
+            return False
 
-        emprestimo = self.repositorio.criar_emprestimo(
-            equipamento,
+        emprestimo_id = self.repositorio.proximo_id_emprestimo()
+
+        emprestimo = equipamento.criar_emprestimo(
+            emprestimo_id,
             usuario_nome,
             usuario_email,
             dias
         )
 
-        equipamento.disponivel = False
-        self.repositorio.salvar_equipamento(equipamento)
+        self.repositorio.salvar_emprestimo(emprestimo)
+        self.repositorio.marcar_indisponivel(equipamento_id)
 
         evento = Evento(
             tipo="emprestimo",
@@ -33,27 +35,18 @@ class ServicoEmprestimo:
 
         self.notificador.notificar(evento)
 
-        return emprestimo
+        return True
 
     def registrar_devolucao(self, emprestimo_id):
         emprestimo = self.repositorio.buscar_emprestimo(emprestimo_id)
 
         if emprestimo is None:
-            raise ValueError("Empréstimo não encontrado.")
+            return False
 
         multa = emprestimo.calcular_multa()
 
-        emprestimo.devolvido = True
-
-        equipamento = self.repositorio.buscar_equipamento(
-            emprestimo.equipamento_id
-        )
-
-        if equipamento is not None:
-            equipamento.disponivel = True
-            self.repositorio.salvar_equipamento(equipamento)
-
-        self.repositorio.salvar_emprestimo(emprestimo)
+        self.repositorio.marcar_devolvido(emprestimo_id)
+        self.repositorio.marcar_disponivel(emprestimo.equipamento_id)
 
         evento = Evento(
             tipo="devolucao",
@@ -63,36 +56,30 @@ class ServicoEmprestimo:
 
         self.notificador.notificar(evento)
 
-        return multa
+        return True
 
     def listar_atrasados(self):
-        emprestimos = self.repositorio.listar_emprestimos()
+        emprestimos_atrasados = self.repositorio.listar_em_atraso()
 
-        atrasados = []
-
-        for emprestimo in emprestimos:
+        for emprestimo in emprestimos_atrasados:
             dias_atraso = emprestimo.dias_atraso()
+            multa = emprestimo.calcular_multa()
 
-            if dias_atraso > 0:
-                multa_calculada = emprestimo.calcular_multa()
+            self._imprimir_linha_atraso(
+                emprestimo,
+                dias_atraso,
+                multa
+            )
 
-                atrasados.append(emprestimo)
+            evento = Evento(
+                tipo="atraso",
+                email=emprestimo.usuario_email,
+                multa=multa
+            )
 
-                self._imprimir_linha_atraso(
-                    emprestimo,
-                    dias_atraso,
-                    multa_calculada
-                )
+            self.notificador.notificar(evento)
 
-                evento = Evento(
-                    tipo="atraso",
-                    email=emprestimo.usuario_email,
-                    multa=multa_calculada
-                )
-
-                self.notificador.notificar(evento)
-
-        return atrasados
+        return emprestimos_atrasados
 
     def _imprimir_linha_atraso(
         self,
