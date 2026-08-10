@@ -1,90 +1,107 @@
-# ServicoEmprestimo: regras de negócio.
-
-from datetime import date, timedelta
-
-from modelos.emprestimo import Emprestimo
-from repositorios.interfaces import IRepositorioEmprestimo
-from servicos.interfaces import INotificador
 from servicos.evento import Evento
 
 
 class ServicoEmprestimo:
-
-    def __init__(self, repositorio: IRepositorioEmprestimo, notificador: INotificador):
-        """DIP aplicado: dependências são injetadas via construtor"""
+    def __init__(self, repositorio, notificador):
         self.repositorio = repositorio
         self.notificador = notificador
 
-    def registrar(self, equipamento_id: int, usuario_nome: str, usuario_email: str, dias: int):
+    def registrar(self, equipamento_id, usuario_nome, usuario_email, dias):
         equipamento = self.repositorio.buscar_equipamento(equipamento_id)
 
-        if not equipamento or not equipamento.disponivel:
-            return False
+        if equipamento is None:
+            raise ValueError("Equipamento não encontrado.")
 
-        emprestimo = Emprestimo(
-            id=self.repositorio.proximo_id_emprestimo(),
-            equipamento_id=equipamento_id,
-            usuario_nome=usuario_nome,
-            usuario_email=usuario_email,
-            data_emprestimo=date.today(),
-            data_devolucao=date.today() + timedelta(days=dias)
+        if not equipamento.disponivel:
+            raise ValueError("Equipamento indisponível.")
+
+        emprestimo = self.repositorio.criar_emprestimo(
+            equipamento,
+            usuario_nome,
+            usuario_email,
+            dias
         )
 
-        self.repositorio.salvar_emprestimo(emprestimo)
-        self.repositorio.marcar_indisponivel(equipamento_id)
+        equipamento.disponivel = False
+        self.repositorio.salvar_equipamento(equipamento)
 
-        self.notificador.notificar(
-            Evento("emprestimo", usuario_email, data=emprestimo.data_devolucao)
+        evento = Evento(
+            tipo="emprestimo",
+            email=usuario_email,
+            data=emprestimo.data_devolucao
         )
 
-        return True
+        self.notificador.notificar(evento)
 
-    def registrar_devolucao(self, emprestimo_id: int):
+        return emprestimo
+
+    def registrar_devolucao(self, emprestimo_id):
         emprestimo = self.repositorio.buscar_emprestimo(emprestimo_id)
 
-        if not emprestimo or emprestimo.devolvido:
-            return False
+        if emprestimo is None:
+            raise ValueError("Empréstimo não encontrado.")
 
-        hoje = date.today()
-        multa = 0.0
+        multa = emprestimo.calcular_multa()
 
-        if hoje > emprestimo.data_devolucao:
-            dias_atraso = (hoje - emprestimo.data_devolucao).days
-            equipamento = self.repositorio.buscar_equipamento(emprestimo.equipamento_id)
-            if equipamento:
-                multa = equipamento.calcular_multa(dias_atraso)
-                self.notificador.notificar(Evento("atraso", emprestimo.usuario_email))
+        emprestimo.devolvido = True
 
-        self.repositorio.marcar_devolvido(emprestimo_id)
-        self.repositorio.marcar_disponivel(emprestimo.equipamento_id)
-
-        self.notificador.notificar(
-            Evento("devolucao", emprestimo.usuario_email, multa=multa)
+        equipamento = self.repositorio.buscar_equipamento(
+            emprestimo.equipamento_id
         )
 
-        return True
+        if equipamento is not None:
+            equipamento.disponivel = True
+            self.repositorio.salvar_equipamento(equipamento)
+
+        self.repositorio.salvar_emprestimo(emprestimo)
+
+        evento = Evento(
+            tipo="devolucao",
+            email=emprestimo.usuario_email,
+            multa=multa
+        )
+
+        self.notificador.notificar(evento)
+
+        return multa
 
     def listar_atrasados(self):
-        atrasados = self.repositorio.listar_em_atraso()
+        emprestimos = self.repositorio.listar_emprestimos()
 
-        if not atrasados:
-            print("Nenhum empréstimo em atraso.")
-            return
+        atrasados = []
 
-        print("\n=== EMPRÉSTIMOS EM ATRASO ===")
+        for emprestimo in emprestimos:
+            dias_atraso = emprestimo.dias_atraso()
 
-        for emprestimo in atrasados:
-            dias_atraso = (date.today() - emprestimo.data_devolucao).days
-            equipamento = self.repositorio.buscar_equipamento(emprestimo.equipamento_id)
-            multa_calculada = equipamento.calcular_multa(dias_atraso) if equipamento else 0.0
+            if dias_atraso > 0:
+                multa_calculada = emprestimo.calcular_multa()
 
-            self._imprimir_linha_atraso(emprestimo, dias_atraso, multa_calculada)
-            self.notificador.notificar(Evento("atraso", emprestimo.usuario_email))
+                atrasados.append(emprestimo)
 
-    def _imprimir_linha_atraso(self, emprestimo, dias_atraso: int, multa: float):
-        """Método extraído (Extract Function) - Aula 12"""
+                self._imprimir_linha_atraso(
+                    emprestimo,
+                    dias_atraso,
+                    multa_calculada
+                )
+
+                evento = Evento(
+                    tipo="atraso",
+                    email=emprestimo.usuario_email,
+                    multa=multa_calculada
+                )
+
+                self.notificador.notificar(evento)
+
+        return atrasados
+
+    def _imprimir_linha_atraso(
+        self,
+        emprestimo,
+        dias_atraso,
+        multa
+    ):
         print(
-            f"ID: {emprestimo.id} | Usuário: {emprestimo.usuario_nome} | "
-            f"Email: {emprestimo.usuario_email} | Devolução prevista: {emprestimo.data_devolucao} | "
-            f"Dias atraso: {dias_atraso} | Multa: R${multa:.2f}"
+            f"Usuário {emprestimo.usuario_nome} "
+            f"está atrasado {dias_atraso} dia(s). "
+            f"Multa: R${multa:.2f}"
         )
